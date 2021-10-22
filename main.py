@@ -15,10 +15,10 @@ CONST_BONUS_TEMPLATE = cv.imread("bonus.png", cv.IMREAD_GRAYSCALE)  # thing to f
 
 # clicks like a human (with some delay)
 def click():
-    wa.mouse_event(2, 0, 0)          # hold down lmb
+    wa.mouse_event(2, 0, 0)  # hold down lmb
     slp = random.randrange(97, 205)
     sleep(slp / 1000)
-    wa.mouse_event(4, 0, 0)          # release lmb
+    wa.mouse_event(4, 0, 0)  # release lmb
 
 
 # navigates from main menu to one of the expert map screens
@@ -32,38 +32,41 @@ def nav_main_to_expert():
     click()
     sleep(0.3)
 
-def move_cursor(x,y):
-    wa.SetCursorPos([x,y])
-    
+
+def move_cursor(x, y):
+    wa.SetCursorPos([x, y])
+
+
 def place_monkey(monkey):
-  m = 81
-  # monkey_list = [["dart", Q], ["ben", U]]
-  wa.keybd_event(m, m, 0, 0)
-  slp = random.randrange(97, 205)
-  sleep(slp / 1000)
-  wa.keybd_event(m, m, wc.KEYEVENTF_KEYUP, 0)
-  click()
+    m = 81
+    # monkey_list = [["dart", Q], ["ben", U]]
+    wa.keybd_event(m, m, 0, 0)
+    slp = random.randrange(97, 205)
+    sleep(slp / 1000)
+    wa.keybd_event(m, m, wc.KEYEVENTF_KEYUP, 0)
+    click()
+
 
 # returns the top left coordinates of tmpl inside of img
 def match_template(img, tmpl):
-  res = cv.matchTemplate(img, tmpl, cv.TM_CCOEFF_NORMED)
-  min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
-  if max_val > 0.3:
-    return max_loc
-  else:
-    return False
+    res = cv.matchTemplate(img, tmpl, cv.TM_CCOEFF_NORMED)
+    min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
+    if max_val > 0.3:
+        return max_loc
+    else:
+        return False
 
 
 # saves screenshot to "monitor-1.png"
 def take_screenshot():
-  with mss() as sct:
-    sct.shot()
+    with mss() as sct:
+        sct.shot()
 
 
 def solve_quad():
-  move_cursor(835,271)
-  place_monkey("dart")
-    
+    move_cursor(835, 271)
+    place_monkey("dart")
+
 
 print("The program will take single screenshots of your first monitor for navigation purposes\n")
 
@@ -86,25 +89,25 @@ match = False
     cv.rectangle(scrn, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
     rand_click() """
 
-while match == False:
-  click()
-  sleep(0.3)  
-  take_screenshot()
-  # read in screenshot from file in grayscale
-  screenshot = cv.imread("monitor-1.png", cv.IMREAD_GRAYSCALE)
-  match = match_template(screenshot, CONST_BONUS_TEMPLATE)  
+while not match:
+    click()
+    sleep(0.3)
+    take_screenshot()
+    # read in screenshot from file in grayscale
+    screenshot = cv.imread("monitor-1.png", cv.IMREAD_GRAYSCALE)
+    match = match_template(screenshot, CONST_BONUS_TEMPLATE)
 else:
-  wa.SetCursorPos(match)
-  click()
-  sleep(0.3)
-  move_cursor(632,582)
-  click()
-  sleep(0.3)
-  click()
-  sleep(5)
-  solve_quad()
+    wa.SetCursorPos(match)
+    click()
+    sleep(0.3)
+    move_cursor(632, 582)
+    click()
+    sleep(0.3)
+    click()
+    sleep(5)
+    solve_quad()
 
 # writes screen
 cv.imwrite('res.png', screenshot)
-#opens image for debugging lole
+# opens image for debugging lole
 plt.imshow(screenshot), plt.show()
