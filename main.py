@@ -30,8 +30,8 @@ def nav_to_map():
 
 def match_template(img, tmpl):
     res = cv.matchTemplate(img, tmpl, cv.TM_CCOEFF_NORMED)
-    threshold = 0.8
-    loc = np.where(res >= threshold)  # tuple of matching coordinates
+    loc = cv.minMaxLoc(res)[3]  # tuple of matching coordinates
+    print(loc)
     return loc
 
 
@@ -43,24 +43,24 @@ sleep(0.5)
 with mss() as sct:
     sct.shot()
 
-template = cv.imread("bonus.png", 0)  # thing to find
+template = cv.imread("bonus.png", cv.IMREAD_GRAYSCALE)  # thing to find
 scrn = cv.imread("monitor-1.png", cv.IMREAD_GRAYSCALE)
 w, h = template.shape[::-1]
 
 match = match_template(scrn, template)
-for i in match:
+""" for i in match:
     end = 0
     end = end + len(match[i])
     while end == 0:
         rand_click()
         sleep(0.5)
         match += match_template(scrn, template)
-        print(match)
+        print(match) """
 
-for pt in zip(*match[::-1]):
+""" for pt in zip(*match[::-1]):
     wa.SetCursorPos(pt)
     cv.rectangle(scrn, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
-    rand_click()
+    rand_click() """
 
 cv.imwrite('res.png', scrn)
 plt.imshow(scrn), plt.show()
