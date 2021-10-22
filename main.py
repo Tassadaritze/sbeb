@@ -6,47 +6,61 @@ import win32api as wa
 from time import sleep
 import random as random
 
+CONST_PLAY_BTN_LOC = [800, 950]
+CONST_EXPERT_BTN_LOC = [1300, 1000]
+
 
 def rand_click():
-    wa.mouse_event(2, 0, 0)
+    wa.mouse_event(2, 0, 0)          # hold down lmb
     slp = random.randrange(97, 205)
     print(slp)
     sleep(slp / 1000)
-    wa.mouse_event(4, 0, 0)
+    wa.mouse_event(4, 0, 0)          # release lmb
 
 
-def nav_to_expert():
-    wa.SetCursorPos([800, 950])
+def nav_to_map():
+    wa.SetCursorPos(CONST_PLAY_BTN_LOC)
     rand_click()
     slp = random.randrange(904, 1473)
     print(slp)
     sleep(slp / 1000)
-    wa.SetCursorPos([1300, 1000])
+    wa.SetCursorPos(CONST_EXPERT_BTN_LOC)
     rand_click()
 
 
+def match_template(img, tmpl):
+    res = cv.matchTemplate(img, tmpl, cv.TM_CCOEFF_NORMED)
+    threshold = 0.8
+    loc = np.where(res >= threshold)  # tuple of matching coordinates
+    return loc
+
+
 print("The program will take single screenshots of your first monitor for navigation purposes\n")
-nav_to_expert()
+nav_to_map()
 # input("Open BTD6 main menu on monitor 1, then press any key to continue")
 
+sleep(0.5)
 with mss() as sct:
     sct.shot()
 
-""" template = cv.imread("bonus.png", 0)  # thing to find
-img_rgb = cv.imread("fake.png", 0)   # thing to search through
-img_gray = cv.imread("fake.png", cv.IMREAD_GRAYSCALE)
+template = cv.imread("bonus.png", 0)  # thing to find
+scrn = cv.imread("monitor-1.png", cv.IMREAD_GRAYSCALE)
 w, h = template.shape[::-1]
 
-res = cv.matchTemplate(img_gray, template, cv.TM_CCOEFF_NORMED)
-threshold = 0.8
-loc = np.where(res >= threshold)  # tuple of matching coordinates
-print(loc)
-print(len(loc[0]))
-for pt in zip(*loc[::-1]):
-    cv.rectangle(img_rgb, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
+match = match_template(scrn, template)
+for i in match:
+    end = 0
+    end = end + len(match[i])
+    while end == 0:
+        rand_click()
+        sleep(0.5)
+        match += match_template(scrn, template)
+        print(match)
 
-cv.imwrite('res.png', img_rgb)
-plt.imshow(img_rgb), plt.show() """
+for pt in zip(*match[::-1]):
+    wa.SetCursorPos(pt)
+    cv.rectangle(scrn, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
+    rand_click()
 
-scrn = cv.imread("monitor-1.png", cv.IMREAD_GRAYSCALE)
+cv.imwrite('res.png', scrn)
 plt.imshow(scrn), plt.show()
