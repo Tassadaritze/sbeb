@@ -7,6 +7,7 @@ import numpy as np
 import win32api as wa
 import keyboard
 import pytesseract
+import imutils
 from mss import mss
 
 CONST_PLAY_BTN_LOC = [800, 950]
@@ -146,9 +147,10 @@ def take_screenshot():
 # returns current cash or -1 if OCR fails
 def find_cash():
     take_screenshot()
-    screenshot = cv.imread("monitor-1.png", cv.IMREAD_GRAYSCALE)
-    cash_crop = screenshot[20:65, 347:500]  # crop & convert bgr -> rgb
-
+    screenshot = cv.imread("monitor-1.png")
+    gray = cv.cvtColor(screenshot, cv.COLOR_BGR2GRAY)
+    thresh = cv.threshold(gray, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU)[1]
+    cash_crop = thresh[20:65, 347:500]  # crop & convert bgr -> rgb
     tesseract_out = pytesseract.image_to_string(cash_crop, config="--psm 13")  # Tesseract does its best to recognise something
     print("ocr out")
     print(tesseract_out)
@@ -230,6 +232,8 @@ def solve_dark_castle():
 
 
 print("The program will take single screenshots of your first monitor for navigation purposes\n")
+
+find_cash()
 
 # input("Open BTD6 main menu on monitor 1, then press any key to continue")
 
