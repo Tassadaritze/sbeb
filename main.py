@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import win32api as wa
 import keyboard
+import pytesseract
 from mss import mss
 
 CONST_PLAY_BTN_LOC = [800, 950]
@@ -13,6 +14,7 @@ CONST_EXPERT_BTN_LOC = [1300, 1000]
 CONST_BONUS_TEMPLATE = cv.imread("bonus.png", cv.IMREAD_GRAYSCALE)  # thing to find
 
 placed_monkeys = {}
+
 
 # clicks like a human (with some delay)
 def click():
@@ -33,7 +35,7 @@ def upgrade_top(position):
     move_cursor(x, y)
     click()
     sleep(0.2)
-    press('/')
+    press(',')
 
 
 def upgrade_mid(position):
@@ -42,7 +44,7 @@ def upgrade_mid(position):
     move_cursor(x, y)
     click()
     sleep(0.2)
-    press('/')
+    press('.')
 
 
 def upgrade_bot(position):
@@ -71,7 +73,7 @@ def move_cursor(x, y):
 
 
 def place_monkey(monkey, x, y):
-    move_cursor(x,y)
+    move_cursor(x, y)
     monkey_list = {"dart": 'q', "hero": 'u', "sub": 'x', "sniper": 'z', "spac": 'j', "wizard": 'a'}
     desired_key = monkey_list[monkey]
     press(desired_key)
@@ -117,10 +119,16 @@ def solve_dark_castle():
     upgrade_bot(placed_monkeys["sub"])
     
 
-
 print("The program will take single screenshots of your first monitor for navigation purposes\n")
 
 # input("Open BTD6 main menu on monitor 1, then press any key to continue")
+
+img_cv = cv.imread(r'./test.png')
+
+# By default OpenCV stores images in BGR format and since pytesseract assumes RGB format,
+# we need to convert from BGR to RGB format/mode:
+img_rgb = cv.cvtColor(img_cv, cv.COLOR_BGR2RGB)
+print(pytesseract.image_to_string(img_rgb))
 
 # press enter after opening bloons on the main menu
 keyboard.wait('enter')
