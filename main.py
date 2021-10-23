@@ -5,13 +5,14 @@ import cv2 as cv
 import matplotlib.pyplot as plt
 import numpy as np
 import win32api as wa
-import win32con as wc
+import keyboard
 from mss import mss
 
 CONST_PLAY_BTN_LOC = [800, 950]
 CONST_EXPERT_BTN_LOC = [1300, 1000]
 CONST_BONUS_TEMPLATE = cv.imread("bonus.png", cv.IMREAD_GRAYSCALE)  # thing to find
 
+placed_monkeys = {}
 
 # clicks like a human (with some delay)
 def click():
@@ -20,6 +21,38 @@ def click():
     sleep(slp / 1000)
     wa.mouse_event(4, 0, 0)  # release lmb
 
+
+def press(button):
+    keyboard.press_and_release(button)
+    sleep(0.01)
+
+
+def upgrade_top(position):
+    x = position[0]
+    y = position[1]
+    move_cursor(x, y)
+    click()
+    sleep(0.2)
+    press('/')
+
+
+def upgrade_mid(position):
+    x = position[0]
+    y = position[1]
+    move_cursor(x, y)
+    click()
+    sleep(0.2)
+    press('/')
+
+
+def upgrade_bot(position):
+    x = position[0]
+    y = position[1]
+    move_cursor(x, y)
+    click()
+    sleep(0.2)
+    press('/')
+    
 
 # navigates from main menu to one of the expert map screens
 def nav_main_to_expert():
@@ -37,14 +70,19 @@ def move_cursor(x, y):
     wa.SetCursorPos([x, y])
 
 
-def place_monkey(monkey):
-    m = 81
-    # monkey_list = [["dart", Q], ["ben", U]]
-    wa.keybd_event(m, m, 0, 0)
-    slp = random.randrange(97, 205)
-    sleep(slp / 1000)
-    wa.keybd_event(m, m, wc.KEYEVENTF_KEYUP, 0)
+def place_monkey(monkey, x, y):
+    move_cursor(x,y)
+    monkey_list = {"dart": 'q', "hero": 'u', "sub": 'x', "sniper": 'z', "spac": 'j', "wizard": 'a'}
+    desired_key = monkey_list[monkey]
+    press(desired_key)
     click()
+    placed_monkeys.update({monkey: (x, y)})
+
+
+def start_game():
+    press('space')
+    sleep(0.5)
+    press('space')
 
 
 # returns the top left coordinates of tmpl inside of img
@@ -64,13 +102,28 @@ def take_screenshot():
 
 
 def solve_quad():
-    move_cursor(835, 271)
-    place_monkey("dart")
+    return
+
+
+def solve_dark_castle():
+    place_monkey("dart", 577, 491)
+    sleep(12)
+    place_monkey("hero", 910, 144)
+    sleep(10)
+    place_monkey("sub", 1083, 694)
+    click()
+    print(placed_monkeys.items())
+    sleep(15)
+    upgrade_bot(placed_monkeys["sub"])
+    
 
 
 print("The program will take single screenshots of your first monitor for navigation purposes\n")
 
 # input("Open BTD6 main menu on monitor 1, then press any key to continue")
+
+# press enter after opening bloons on the main menu
+keyboard.wait('enter')
 nav_main_to_expert()
 
 match = False
@@ -105,9 +158,10 @@ else:
     sleep(0.3)
     click()
     sleep(5)
-    solve_quad()
+    start_game()
+    solve_dark_castle()
 
 # writes screen
-cv.imwrite('res.png', screenshot)
+# cv.imwrite('res.png', screenshot)
 # opens image for debugging lole
-plt.imshow(screenshot), plt.show()
+# plt.imshow(screenshot), plt.show()
