@@ -103,6 +103,32 @@ def take_screenshot():
         sct.shot()
 
 
+# returns current cash or -1 if OCR fails
+def find_cash():
+    take_screenshot()
+    screenshot = cv.imread("monitor-1.png", cv.IMREAD_GRAYSCALE)
+    cash_crop = screenshot[20:65, 347:500]  # crop & convert bgr -> rgb
+    plt.imshow(cash_crop), plt.show()
+    tesseract_out = pytesseract.image_to_string(cash_crop, config="--psm 13")  # Tesseract does its best to recognise something
+    print(tesseract_out)
+    found_cash_list = [s for s in list(tesseract_out) if s.isdigit()]  # Find digits in what was recognised
+    try:
+        found_cash = int("".join(found_cash_list))
+        print(found_cash)
+        return found_cash
+    except ValueError:
+        print("Could not recognise cash value")
+        return -1
+
+
+def wait_cash():
+    return
+
+
+def solve_infernal():
+    place_monkey("dart", 836, 387)
+
+
 def solve_quad():
     return
 
@@ -123,12 +149,7 @@ print("The program will take single screenshots of your first monitor for naviga
 
 # input("Open BTD6 main menu on monitor 1, then press any key to continue")
 
-img_cv = cv.imread(r'./test.png')
-
-# By default OpenCV stores images in BGR format and since pytesseract assumes RGB format,
-# we need to convert from BGR to RGB format/mode:
-img_rgb = cv.cvtColor(img_cv, cv.COLOR_BGR2RGB)
-print(pytesseract.image_to_string(img_rgb))
+print(find_cash())
 
 # press enter after opening bloons on the main menu
 keyboard.wait('enter')
@@ -155,8 +176,8 @@ while not match:
     sleep(0.3)
     take_screenshot()
     # read in screenshot from file in grayscale
-    screenshot = cv.imread("monitor-1.png", cv.IMREAD_GRAYSCALE)
-    match = match_template(screenshot, CONST_BONUS_TEMPLATE)
+    menu_screenshot = cv.imread("monitor-1.png", cv.IMREAD_GRAYSCALE)
+    match = match_template(menu_screenshot, CONST_BONUS_TEMPLATE)
 else:
     wa.SetCursorPos(match)
     click()
@@ -167,7 +188,8 @@ else:
     click()
     sleep(5)
     start_game()
-    solve_dark_castle()
+    # solve_dark_castle()
+    solve_infernal()
 
 # writes screen
 # cv.imwrite('res.png', screenshot)
