@@ -6,6 +6,10 @@ import pytesseract
 import utils
 from config import hotkeys
 
+CONST_UPG_TOP = hotkeys.upg_top
+CONST_UPG_MID = hotkeys.upg_mid
+CONST_UPG_BOT = hotkeys.upg_bot
+
 placed_monkeys = {}
 
 
@@ -15,31 +19,17 @@ def start_game():
     utils.press(hotkeys.play_ff)
 
 
+# Upgrade monkey located at given position on given path
 def upgrade(path, position):
-    x = position[0]
-    y = position[1]
-    utils.move_cursor(x, y)
-    utils.click()
-    utils.press(hotkeys.upg_top)
-    utils.press('escape')
-
-
-""" def upgrade_mid(position):
-    x = position[0]
-    y = position[1]
-    utils.move_cursor(x, y)
-    utils.click()
-    utils.press(hotkeys.upg_mid)
-    utils.press('escape')
-
-
-def upgrade_bot(position):
-    x = position[0]
-    y = position[1]
-    utils.move_cursor(x, y)
-    utils.click()
-    utils.press('/')
-    utils.press('escape') """
+    if [CONST_UPG_TOP, CONST_UPG_MID, CONST_UPG_BOT].count(path) == 0:
+        raise ValueError("Tried to upgrade using invalid hotkey")
+    else:
+        x = position[0]
+        y = position[1]
+        utils.move_cursor(x, y)
+        utils.click()
+        utils.press(path)
+        utils.press("escape")
 
 
 # returns current cash or -1 if OCR fails
@@ -49,7 +39,7 @@ def find_cash():
     gray = cv.cvtColor(screenshot, cv.COLOR_BGR2GRAY)
     thresh = cv.threshold(gray, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU)[1]
     cash_crop = thresh[20:65, 347:500]
-    custom_oem_psm_config = r'--oem 3 --psm 13'
+    custom_oem_psm_config = r'--oem 3 --psm 7'
     tesseract_out = pytesseract.image_to_string(cash_crop,
                                                 config=custom_oem_psm_config)  # Tesseract does its best to recognise something
     found_cash_list = [s for s in list(tesseract_out) if s.isdigit()]  # Find digits in what was recognised
@@ -81,7 +71,7 @@ def find_round():
     thresh = cv.threshold(gray, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU)[1]
     round_crop = thresh[30:65, 1430:1485]  # crop
     cv.imwrite('round.png', round_crop)
-    custom_oem_psm_config = r'--oem 3 --psm 13'
+    custom_oem_psm_config = r'--oem 3 --psm 7'
     tesseract_out = pytesseract.image_to_string(round_crop,
                                                 config=custom_oem_psm_config)  # Tesseract does its best to recognise something
     print(tesseract_out)
@@ -112,8 +102,7 @@ def wait_for_victory(seconds):
 
 def place_monkey(monkey, x, y):
     utils.move_cursor(x, y)
-    monkey_list = {"dart": 'q', "hero": 'u', "sub": 'x', "sniper": 'z', "spac": 'j', "wizard": 'a', "alch": 'f'}
-    desired_key = monkey_list[monkey]
+    desired_key = hotkeys[monkey]
     utils.press(desired_key)
     utils.click()
     placed_monkeys.update({monkey: (x, y)})
@@ -134,36 +123,36 @@ def solve_dark_castle():
     wait_for_cash(170)
     place_monkey("sub", 1083, 694)
     wait_for_cash(380)
-    upgrade_bot(placed_monkeys["sub"])
+    upgrade(CONST_UPG_BOT, placed_monkeys["sub"])
     wait_for_cash(850)
-    upgrade_bot(placed_monkeys["sub"])
+    upgrade(CONST_UPG_BOT, placed_monkeys["sub"])
     wait_for_cash(535)
-    upgrade_top(placed_monkeys["sub"])
-    upgrade_top(placed_monkeys["sub"])
+    upgrade(CONST_UPG_TOP, placed_monkeys["sub"])
+    upgrade(CONST_UPG_TOP, placed_monkeys["sub"])
     wait_for_cash(245)
-    upgrade_bot(placed_monkeys["dart"])
-    upgrade_bot(placed_monkeys["dart"])
+    upgrade(CONST_UPG_BOT, placed_monkeys["dart"])
+    upgrade(CONST_UPG_BOT, placed_monkeys["dart"])
     wait_for_cash(935)
-    upgrade_bot(placed_monkeys["sub"])
+    upgrade(CONST_UPG_BOT, placed_monkeys["sub"])
     wait_for_cash(2550)
-    upgrade_bot(placed_monkeys["sub"])
+    upgrade(CONST_UPG_BOT, placed_monkeys["sub"])
     wait_for_cash(530)
-    upgrade_bot(placed_monkeys["dart"])
+    upgrade(CONST_UPG_BOT, placed_monkeys["dart"])
     wait_for_cash(470)
     place_monkey("alch", 924, 666)
     wait_for_cash(1700)
-    upgrade_top(placed_monkeys["alch"])
-    upgrade_top(placed_monkeys["alch"])
-    upgrade_top(placed_monkeys["alch"])
+    upgrade(CONST_UPG_TOP, placed_monkeys["alch"])
+    upgrade(CONST_UPG_TOP, placed_monkeys["alch"])
+    upgrade(CONST_UPG_TOP, placed_monkeys["alch"])
     wait_for_cash(615)
-    upgrade_mid(placed_monkeys["alch"])
-    upgrade_mid(placed_monkeys["alch"])
+    upgrade(CONST_UPG_MID, placed_monkeys["alch"])
+    upgrade(CONST_UPG_MID, placed_monkeys["alch"])
     wait_for_cash(2550)
-    upgrade_top(placed_monkeys["alch"])
+    upgrade(CONST_UPG_TOP, placed_monkeys["alch"])
 
     # just in case
     wait_for_cash(6000)
-    upgrade_bot(placed_monkeys["sub"])
-    upgrade_top(placed_monkeys["alch"])
+    upgrade(CONST_UPG_BOT, placed_monkeys["sub"])
+    upgrade(CONST_UPG_TOP, placed_monkeys["alch"])
     wait_for_round(39)
     wait_for_victory(27)
