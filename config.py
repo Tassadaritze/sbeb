@@ -25,5 +25,7 @@ hotkeys = {
     "upg_top": ",",
     "upg_mid": ".",
     "upg_bot": "/",
+    "targ_next": "tab",
+    "targ_prev": "ctrl+tab",
     "play_ff": "space"
 }
