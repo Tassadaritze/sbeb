@@ -6,17 +6,17 @@ import pytesseract
 import utils
 from config import hotkeys
 
-CONST_UPG_TOP = hotkeys.upg_top
-CONST_UPG_MID = hotkeys.upg_mid
-CONST_UPG_BOT = hotkeys.upg_bot
+CONST_UPG_TOP = hotkeys["upg_top"]
+CONST_UPG_MID = hotkeys["upg_mid"]
+CONST_UPG_BOT = hotkeys["upg_bot"]
 
 placed_monkeys = {}
 
 
 def start_game():
-    utils.press(hotkeys.play_ff)
+    utils.press(hotkeys["play_ff"])
     sleep(0.5)
-    utils.press(hotkeys.play_ff)
+    utils.press(hotkeys["play_ff"])
 
 
 # Upgrade monkey located at given position on given path
@@ -92,7 +92,7 @@ def wait_for_round(number):
         sleep(3)
         current_round = find_round()
     else:
-        print("current round: " + str(current_round) + " = " + str(number))
+        print("current round: " + str(current_round) + " >= " + str(number))
         return
 
 
@@ -108,12 +108,56 @@ def place_monkey(monkey, x, y):
     placed_monkeys.update({monkey: (x, y)})
 
 
+# Sets targeting for tower located at position to Strong for normal towers or Smart for spactory
+def set_targeting(position):
+    x = position[0]
+    y = position[1]
+    utils.move_cursor(x, y)
+    utils.click()
+    utils.press(hotkeys["targ_prev"])
+    utils.press("escape")
+
+
 def solve_infernal():
     place_monkey("dart", 836, 387)
 
 
 def solve_quad():
-    return
+    place_monkey("dart", 834, 270)
+    wait_for_cash(920)
+    place_monkey("hero", 1154, 322)
+    wait_for_cash(170)
+    place_monkey("sub", 960, 623)
+    wait_for_cash(340)
+    place_monkey("wizard", 1267, 598)
+    wait_for_cash(1020)
+    upgrade(CONST_UPG_MID, placed_monkeys["wizard"])
+    upgrade(CONST_UPG_MID, placed_monkeys["wizard"])
+    wait_for_cash(230)
+    upgrade(CONST_UPG_BOT, placed_monkeys["wizard"])
+    wait_for_cash(255)
+    upgrade(CONST_UPG_BOT, placed_monkeys["wizard"])
+    wait_for_cash(700)
+    place_monkey("spac", 398, 525)
+    wait_for_cash(680)
+    upgrade(CONST_UPG_TOP, placed_monkeys["spac"])
+    wait_for_cash(510)
+    upgrade(CONST_UPG_TOP, placed_monkeys["spac"])
+    wait_for_cash(580)
+    place_monkey("sniper", 840, 714)
+    set_targeting(placed_monkeys["sniper"])
+    upgrade(CONST_UPG_TOP, placed_monkeys["sniper"])
+    wait_for_cash(680)
+    upgrade(CONST_UPG_BOT, placed_monkeys["sniper"])
+    upgrade(CONST_UPG_BOT, placed_monkeys["sniper"])
+    wait_for_cash(1275)
+    upgrade(CONST_UPG_TOP, placed_monkeys["sniper"])
+    wait_for_cash(2975)
+    upgrade(CONST_UPG_BOT, placed_monkeys["sniper"])
+    wait_for_cash(3610)
+    upgrade(CONST_UPG_BOT, placed_monkeys["sniper"])
+    wait_for_round(39)
+    wait_for_victory(25)
 
 
 def solve_dark_castle():

@@ -125,7 +125,8 @@ else:
     # hardcoded dark castle
     utils.click()
     sleep(0.3)
-    utils.move_cursor(950, 260)
+    # utils.move_cursor(950, 260) -- dark castle
+    utils.move_cursor(532, 260)
 
     utils.click()
     sleep(0.3)
@@ -135,7 +136,8 @@ else:
     utils.click()
     sleep(5)
     solutions.start_game()
-    solutions.solve_dark_castle()
+    # solutions.solve_dark_castle()
+    solutions.solve_quad()
     nav_victory_to_main()
     # solve_infernal()
     open_chest()
