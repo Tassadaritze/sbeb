@@ -3,7 +3,6 @@ from time import sleep
 
 import cv2 as cv
 import keyboard
-import matplotlib.pyplot as plt
 import win32api as wa
 from mss import mss
 
@@ -143,5 +142,3 @@ else:
 
 # writes screen
 # cv.imwrite('res.png', screenshot)
-# opens image for debugging lole
-# plt.imshow(screenshot), plt.show()
