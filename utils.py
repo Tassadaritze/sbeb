@@ -28,4 +28,3 @@ def press(button):
 def take_screenshot():
     with mss() as sct:
         sct.shot()
-

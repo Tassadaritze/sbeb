@@ -20,7 +20,7 @@ CONST_INSTA2_BTN_LOC = [1110, 550]
 CONST_CONTINUE_BTN_LOC = [950, 1000]
 CONST_CANCEL_BTN_LOC = [780, 730]
 CONST_BONUS_TEMPLATE = cv.imread("bonus.png", cv.IMREAD_GRAYSCALE)  # thing to find
-    
+
 
 # navigates from main menu to one of the expert map screens
 def nav_main_to_expert():
@@ -31,6 +31,7 @@ def nav_main_to_expert():
     wa.SetCursorPos(CONST_EXPERT_BTN_LOC)
     utils.click()
     sleep(0.3)
+
 
 def nav_victory_to_main():
     wa.SetCursorPos(CONST_NEXT_BTN_LOC)
@@ -80,10 +81,9 @@ def match_template(img, tmpl):
 def take_screenshot():
     with mss() as sct:
         sct.shot()
-    
+
 
 print("The program will take single screenshots of your first monitor for navigation purposes\n")
-
 
 # keyboard.wait('enter')
 # open_chest()
@@ -113,8 +113,8 @@ match = False
     rand_click() """
 
 while False:
-# while not match:
-    click()
+    # while not match:
+    utils.click()
     sleep(0.3)
     take_screenshot()
     # read in screenshot from file in grayscale

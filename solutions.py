@@ -4,31 +4,32 @@ import cv2 as cv
 import pytesseract
 
 import utils
+from config import hotkeys
 
 placed_monkeys = {}
 
 
 def start_game():
-    utils.press('space')
+    utils.press(hotkeys.play_ff)
     sleep(0.5)
-    utils.press('space')
+    utils.press(hotkeys.play_ff)
 
 
-def upgrade_top(position):
+def upgrade(path, position):
     x = position[0]
     y = position[1]
     utils.move_cursor(x, y)
     utils.click()
-    utils.press(',')
+    utils.press(hotkeys.upg_top)
     utils.press('escape')
 
 
-def upgrade_mid(position):
+""" def upgrade_mid(position):
     x = position[0]
     y = position[1]
     utils.move_cursor(x, y)
     utils.click()
-    utils.press('.')
+    utils.press(hotkeys.upg_mid)
     utils.press('escape')
 
 
@@ -38,7 +39,7 @@ def upgrade_bot(position):
     utils.move_cursor(x, y)
     utils.click()
     utils.press('/')
-    utils.press('escape')
+    utils.press('escape') """
 
 
 # returns current cash or -1 if OCR fails
@@ -49,7 +50,8 @@ def find_cash():
     thresh = cv.threshold(gray, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU)[1]
     cash_crop = thresh[20:65, 347:500]
     custom_oem_psm_config = r'--oem 3 --psm 13'
-    tesseract_out = pytesseract.image_to_string(cash_crop, config=custom_oem_psm_config)  # Tesseract does its best to recognise something
+    tesseract_out = pytesseract.image_to_string(cash_crop,
+                                                config=custom_oem_psm_config)  # Tesseract does its best to recognise something
     found_cash_list = [s for s in list(tesseract_out) if s.isdigit()]  # Find digits in what was recognised
     try:
         found_cash = int("".join(found_cash_list))
@@ -78,9 +80,10 @@ def find_round():
     gray = cv.cvtColor(screenshot, cv.COLOR_BGR2GRAY)
     thresh = cv.threshold(gray, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU)[1]
     round_crop = thresh[30:65, 1430:1485]  # crop
-    cv.imwrite('round.png', round_crop)    
+    cv.imwrite('round.png', round_crop)
     custom_oem_psm_config = r'--oem 3 --psm 13'
-    tesseract_out = pytesseract.image_to_string(round_crop, config=custom_oem_psm_config)  # Tesseract does its best to recognise something
+    tesseract_out = pytesseract.image_to_string(round_crop,
+                                                config=custom_oem_psm_config)  # Tesseract does its best to recognise something
     print(tesseract_out)
     found_round_list = [s for s in list(tesseract_out) if s.isdigit()]  # Find digits in what was recognised
     try:
@@ -105,7 +108,7 @@ def wait_for_round(number):
 
 def wait_for_victory(seconds):
     sleep(seconds)
-    
+
 
 def place_monkey(monkey, x, y):
     utils.move_cursor(x, y)
@@ -157,13 +160,10 @@ def solve_dark_castle():
     upgrade_mid(placed_monkeys["alch"])
     wait_for_cash(2550)
     upgrade_top(placed_monkeys["alch"])
-    
+
     # just in case
     wait_for_cash(6000)
     upgrade_bot(placed_monkeys["sub"])
     upgrade_top(placed_monkeys["alch"])
     wait_for_round(39)
     wait_for_victory(27)
-
-
-    
