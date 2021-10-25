@@ -84,9 +84,10 @@ def take_screenshot():
 
 print("The program will take single screenshots of your first monitor for navigation purposes\n")
 
-# keyboard.wait('enter')
+keyboard.wait('enter')
+
 # open_chest()
-# find_cash()
+solutions.find_cash()
 # find_round()
 
 # input("Open BTD6 main menu on monitor 1, then press any key to continue")

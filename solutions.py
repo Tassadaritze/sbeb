@@ -1,16 +1,66 @@
+import logging as log
 from time import sleep
 
 import cv2 as cv
+import numpy as np
 import pytesseract
 
 import utils
 from config import hotkeys
 
-CONST_UPG_TOP = hotkeys["upg_top"]
-CONST_UPG_MID = hotkeys["upg_mid"]
-CONST_UPG_BOT = hotkeys["upg_bot"]
+CONST_UPG_TOP = "upg_top"
+CONST_UPG_MID = "upg_mid"
+CONST_UPG_BOT = "upg_bot"
 
 placed_monkeys = {}
+
+
+class Monkey:
+    def __init__(self, type, x, y):
+        self.type = type
+        self.x = x
+        self.y = y
+        self.upgrades = [0, 0, 0]
+        self.target = 0
+        self.targets = ["first", "last", "close", "strong"]
+        self.place()
+
+
+    def place(self):
+        utils.move_cursor(self.x, self.y)
+        desired_key = hotkeys[self.type]
+        utils.press(desired_key)
+        utils.click()
+    
+
+    def select(self):
+        utils.move_cursor(self.x, self.y)
+        utils.click()
+
+
+    def upgrade(self, path):
+        if [CONST_UPG_TOP, CONST_UPG_MID, CONST_UPG_BOT].count(path) == 0:
+            log.error("Tried to upgrade using invalid hotkey")
+        else:
+            self.select()
+            utils.press(hotkeys[path])
+            utils.press("esc")
+    
+
+    def set_targeting(self, desired_targeting):
+        if self.targets.count(desired_targeting) == 0:
+            log.error("Tried to set targeting using invalid hotkey")
+        self.select()
+        if self.type == "spac":
+            return
+        while self.target != self.targets.index(desired_targeting):
+            utils.press(hotkeys["targ_next"])
+            self.target = (self.target + 1) % 4
+        utils.press("esc")
+
+
+    def print_type(self):
+        print("I am a " + self.type)
 
 
 def start_game():
@@ -28,21 +78,28 @@ def upgrade(path, position):
         y = position[1]
         utils.move_cursor(x, y)
         utils.click()
-        utils.press(path)
-        utils.press("escape")
+        utils.press(hotkeys[path])
+        utils.press("esc")
 
 
 # returns current cash or -1 if OCR fails
 def find_cash():
     utils.take_screenshot()
     screenshot = cv.imread("monitor-1.png")
+    # screenshot = cv.medianBlur(screenshot, 5)
     gray = cv.cvtColor(screenshot, cv.COLOR_BGR2GRAY)
-    thresh = cv.threshold(gray, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU)[1]
-    cash_crop = thresh[20:65, 347:500]
-    custom_oem_psm_config = r'--oem 3 --psm 7'
+    thresh = cv.threshold(gray, 220, 255, cv.THRESH_BINARY_INV)[1]
+    #,+ cv.THRESH_OTSU)[1]
+    cash_crop = thresh[20:65, 345:500]
+    kernel = np.ones((3,3),np.uint8)
+    cash_crop = cv.erode(cash_crop ,kernel,iterations = 2)
+    cv.imwrite('cash.png', cash_crop)
+
+    custom_oem_psm_config = r'--oem 3 --psm 13'
     tesseract_out = pytesseract.image_to_string(cash_crop,
                                                 config=custom_oem_psm_config)  # Tesseract does its best to recognise something
     found_cash_list = [s for s in list(tesseract_out) if s.isdigit()]  # Find digits in what was recognised
+    print(tesseract_out)
     try:
         found_cash = int("".join(found_cash_list))
         return found_cash
@@ -71,7 +128,7 @@ def find_round():
     thresh = cv.threshold(gray, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU)[1]
     round_crop = thresh[30:65, 1430:1485]  # crop
     cv.imwrite('round.png', round_crop)
-    custom_oem_psm_config = r'--oem 3 --psm 7'
+    custom_oem_psm_config = r'--oem 3 --psm 13'
     tesseract_out = pytesseract.image_to_string(round_crop,
                                                 config=custom_oem_psm_config)  # Tesseract does its best to recognise something
     print(tesseract_out)
@@ -123,39 +180,39 @@ def solve_infernal():
 
 
 def solve_quad():
-    place_monkey("dart", 834, 270)
+    dart1 = Monkey("dart", 834, 270)
     wait_for_cash(920)
-    place_monkey("hero", 1154, 322)
+    Monkey("hero", 1154, 322)
     wait_for_cash(170)
-    place_monkey("sub", 960, 623)
+    sub1 = Monkey("sub", 960, 623)
     wait_for_cash(340)
-    place_monkey("wizard", 1267, 598)
+    wiz1 = Monkey("wizard", 1267, 598)
     wait_for_cash(1020)
-    upgrade(CONST_UPG_MID, placed_monkeys["wizard"])
-    upgrade(CONST_UPG_MID, placed_monkeys["wizard"])
+    wiz1.upgrade(CONST_UPG_MID)
+    wiz1.upgrade(CONST_UPG_MID)
     wait_for_cash(230)
-    upgrade(CONST_UPG_BOT, placed_monkeys["wizard"])
+    wiz1.upgrade(CONST_UPG_BOT)
     wait_for_cash(255)
-    upgrade(CONST_UPG_BOT, placed_monkeys["wizard"])
+    wiz1.upgrade(CONST_UPG_BOT)
     wait_for_cash(700)
-    place_monkey("spac", 398, 525)
+    spac1 = Monkey("spac", 398, 525)
     wait_for_cash(680)
-    upgrade(CONST_UPG_TOP, placed_monkeys["spac"])
+    spac1.upgrade(CONST_UPG_TOP)
     wait_for_cash(510)
-    upgrade(CONST_UPG_TOP, placed_monkeys["spac"])
+    spac1.upgrade(CONST_UPG_TOP)
     wait_for_cash(580)
-    place_monkey("sniper", 840, 714)
-    set_targeting(placed_monkeys["sniper"])
-    upgrade(CONST_UPG_TOP, placed_monkeys["sniper"])
+    sniper1 = Monkey("sniper", 840, 714)
+    sniper1.set_targeting("strong")
+    sniper1.upgrade(CONST_UPG_TOP)
     wait_for_cash(680)
-    upgrade(CONST_UPG_BOT, placed_monkeys["sniper"])
-    upgrade(CONST_UPG_BOT, placed_monkeys["sniper"])
+    sniper1.upgrade(CONST_UPG_BOT)
+    sniper1.upgrade(CONST_UPG_BOT)
     wait_for_cash(1275)
-    upgrade(CONST_UPG_TOP, placed_monkeys["sniper"])
+    sniper1.upgrade(CONST_UPG_TOP)
     wait_for_cash(2975)
-    upgrade(CONST_UPG_BOT, placed_monkeys["sniper"])
+    sniper1.upgrade(CONST_UPG_BOT)
     wait_for_cash(3610)
-    upgrade(CONST_UPG_BOT, placed_monkeys["sniper"])
+    sniper1.upgrade(CONST_UPG_BOT)
     wait_for_round(39)
     wait_for_victory(25)
 
