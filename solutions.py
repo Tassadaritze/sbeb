@@ -83,7 +83,7 @@ def upgrade(path, position):
 
 
 # returns current cash or -1 if OCR fails
-def find_cash():
+def find_cash_cum():
     utils.take_screenshot()
     screenshot = cv.imread("monitor-1.png")
     # screenshot = cv.medianBlur(screenshot, 5)
@@ -106,6 +106,23 @@ def find_cash():
     except ValueError:
         print("Could not recognise cash value")
         return -1
+
+
+def find_cash():
+    utils.take_screenshot()
+    screenshot = cv.imread("monitor-1.png", cv.IMREAD_GRAYSCALE)
+    cash_crop = screenshot[20:65, 345:500]
+    # cv.imwrite('cash.png', cash_crop)
+    wano = cv.imread("numbers/9.png", cv.IMREAD_GRAYSCALE)
+    cv.imwrite("cashtest.png", wano)
+    w, h = wano.shape[::-1]  # Dimensions of input template, only 2 arguments because image is grayscale
+    match = cv.matchTemplate(screenshot, wano, cv.TM_CCOEFF_NORMED)
+    threshold = 0.7
+    loc = np.where(match >= threshold)
+    for pt in zip(*loc[::-1]):  # Goes through tuple of matched locations that are above the threshold
+        cv.rectangle(screenshot, pt, (pt[0] + w, pt[1] + h), (0,0,255), 2)
+    print(match)
+    cv.imwrite("cash.png", screenshot)
 
 
 def wait_for_cash(amount):
