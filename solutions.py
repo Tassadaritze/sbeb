@@ -115,18 +115,35 @@ def find_cash_cum():
 def find_cash():
     utils.take_screenshot()
     screenshot = cv.imread("monitor-1.png", cv.IMREAD_GRAYSCALE)
-    cash_crop = screenshot[20:65, 345:500]
+    thresh = cv.adaptiveThreshold(screenshot, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 7, 2)
+    cash_crop = thresh[20:65, 345:530]
     # cv.imwrite('cash.png', cash_crop)
-    wano = cv.imread("numbers/9.png", cv.IMREAD_GRAYSCALE)
-    cv.imwrite("cashtest.png", wano)
-    w, h = wano.shape[::-1]  # Dimensions of input template, only 2 arguments because image is grayscale
-    match = cv.matchTemplate(screenshot, wano, cv.TM_CCOEFF_NORMED)
-    threshold = 0.7
-    loc = np.where(match >= threshold)
-    for pt in zip(*loc[::-1]):  # Goes through tuple of matched locations that are above the threshold
-        cv.rectangle(screenshot, pt, (pt[0] + w, pt[1] + h), (0,0,255), 2)
-    print(match)
-    cv.imwrite("cash.png", screenshot)
+    digits = {}
+    for i in range(10):
+        digit = cv.imread("numbers/" + str(i) + ".png", cv.IMREAD_GRAYSCALE)
+        cv.imwrite("cashtest.png", digit)
+        w, h = digit.shape[::-1]                                      # Dimensions of input template, only 2 arguments because image is grayscale
+        match = cv.matchTemplate(cash_crop, digit, cv.TM_CCOEFF_NORMED)
+        threshold = 0.75
+        loc = np.where(match >= threshold)                            # NumPy is a fuck
+        last_x = False
+        loc[1].sort()
+        true_loc = loc[1].tolist()                                    # Have to convert NumPy array to a normal fucking list
+        for x in loc[1]:                                              # Goes through list of x-coordinates of matched points
+            if isinstance(last_x, np.int64) and x - last_x < w // 2:  # Checks if last_x is a NumPy int64 and if it's too close to the next element
+                true_loc.pop(true_loc.index(last_x))                  # Removes last_x from list if it's too close to the next element
+            last_x = x                                                # Sets last_x up for next iteration and we go agane
+        digits.update(dict.fromkeys(true_loc, i))
+        cv.imwrite("cash.png", cash_crop)
+    sorted_digits = sorted(digits.items())
+    sorted_digits = [str(x[1]) for x in sorted_digits]
+    try:
+        found_cash = int("".join(sorted_digits))
+        cv.imwrite("debug/" + str(found_cash) + ".png", cash_crop)
+        return found_cash
+    except ValueError:
+        print("Could not recognise cash value")
+        return -1
 
 
 def wait_for_cash(amount):
@@ -201,7 +218,27 @@ def solve(map):
 
 
 def solve_sanctuary():
-    dart1 = Monkey("dart", 836, 387)
+    wait_for_cash(920)
+    Monkey("hero", 833, 150)
+    wait_for_cash(185)
+    Monkey("sniper", 256, 964)
+    utils.click()
+    utils.press(hotkeys["targ_prev"])
+    wait_for_cash(340)
+    utils.press(hotkeys[CONST_UPG_BOT])
+    wait_for_cash(340)
+    utils.press(hotkeys[CONST_UPG_BOT])
+    wait_for_cash(295)
+    utils.press(hotkeys[CONST_UPG_TOP])
+    wait_for_cash(2975)
+    utils.press(hotkeys[CONST_UPG_BOT])
+    wait_for_cash(3610)
+    utils.press(hotkeys[CONST_UPG_BOT])
+    wait_for_cash(1275)
+    utils.press(hotkeys[CONST_UPG_TOP])
+    utils.press("escape")
+    wait_for_round(39)
+    wait_for_victory(25)
 
 
 def solve_ravine():

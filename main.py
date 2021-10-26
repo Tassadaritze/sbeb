@@ -113,9 +113,11 @@ print("The program will take single screenshots of your first monitor for naviga
 # solutions.Monkey("dart", 834, 850)
 # solutions.Monkey("dart", 835, 925)
 
+keyboard.wait("enter")
 
 # open_chest()
-# solutions.find_cash()
+# print(solutions.find_cash())
+solutions.solve("sanctuary")
 # find_round()
 
 # input("Open BTD6 main menu on monitor 1, then press any key to continue")
