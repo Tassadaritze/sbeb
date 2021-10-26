@@ -18,7 +18,33 @@ CONST_INSTA1_BTN_LOC = [810, 550]
 CONST_INSTA2_BTN_LOC = [1110, 550]
 CONST_CONTINUE_BTN_LOC = [950, 1000]
 CONST_CANCEL_BTN_LOC = [780, 730]
+CONST_NUMBER_OF_EXPERT_MAP_SCREENS = 2
 CONST_BONUS_TEMPLATE = cv.imread("bonus.png", cv.IMREAD_GRAYSCALE)  # thing to find
+
+
+def get_map(page, x, y):
+    index = 0
+    expert_maps = ["sanctuary", "ravine", "flooded_valley", "infernal", "bloody_puddles",
+     "workshop", "quad", "dark_castle", "muddy_puddles", "ouch"]
+    top_row = y >= 120 and y <= 410
+    bot_row = y >= 434 and y <= 723
+    first_col = x >= 355 and x <= 717
+    second_col = x >= 779 and x <= 1141
+    third_col = x >= 1203 and x <= 1565
+
+    if second_col:
+        index += 1
+    elif third_col:
+        index += 2
+    if bot_row:
+        index += 3
+    while page > 1:
+        index + 6
+        page -= 1
+
+    return expert_maps[index]
+
+
 
 
 # navigates from main menu to one of the expert map screens
@@ -84,10 +110,12 @@ def take_screenshot():
 
 print("The program will take single screenshots of your first monitor for navigation purposes\n")
 
-keyboard.wait('enter')
+# solutions.Monkey("dart", 834, 850)
+# solutions.Monkey("dart", 835, 925)
+
 
 # open_chest()
-solutions.find_cash()
+# solutions.find_cash()
 # find_round()
 
 # input("Open BTD6 main menu on monitor 1, then press any key to continue")
@@ -112,23 +140,20 @@ match = False
     cv.rectangle(scrn, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
     rand_click() """
 
-while False:
-    # while not match:
-    utils.click()
-    sleep(0.3)
+page = 0
+
+while not match:
     take_screenshot()
     # read in screenshot from file in grayscale
     menu_screenshot = cv.imread("monitor-1.png", cv.IMREAD_GRAYSCALE)
     match = match_template(menu_screenshot, CONST_BONUS_TEMPLATE)
-else:
-    # wa.SetCursorPos(match)
-
-    # hardcoded dark castle
     utils.click()
     sleep(0.3)
-    # utils.move_cursor(950, 260) -- dark castle
-    utils.move_cursor(532, 260)
-
+    page = (page + 1) % CONST_NUMBER_OF_EXPERT_MAP_SCREENS
+else:
+    utils.click()
+    sleep(0.3)
+    utils.move_cursor(*match)
     utils.click()
     sleep(0.3)
     utils.move_cursor(632, 582)
@@ -137,10 +162,8 @@ else:
     utils.click()
     sleep(5)
     solutions.start_game()
-    # solutions.solve_dark_castle()
-    solutions.solve_quad()
+    solutions.solve(get_map(page, *match))
     nav_victory_to_main()
-    # solve_infernal()
     open_chest()
 
 # writes screen

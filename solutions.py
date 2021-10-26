@@ -59,6 +59,10 @@ class Monkey:
         utils.press("esc")
 
 
+    def has_left_menu(self):
+        self.x >= 835
+
+
     def print_type(self):
         print("I am a " + self.type)
 
@@ -192,8 +196,33 @@ def set_targeting(position):
     utils.press("escape")
 
 
+def solve(map):
+    eval("solve_" + map + "()")
+
+
+def solve_sanctuary():
+    dart1 = Monkey("dart", 836, 387)
+
+
+def solve_ravine():
+    dart1 = Monkey("dart", 836, 387)
+
+
+def solve_flooded_valley():
+    dart1 = Monkey("dart", 400, 520)
+    wait_for_round(39)
+
+
 def solve_infernal():
-    place_monkey("dart", 836, 387)
+    dart1 = Monkey("dart", 836, 387)
+
+
+def solve_bloody_puddles():
+    dart1 = Monkey("dart", 836, 387)
+
+
+def solve_workshop():
+    dart1 = Monkey("dart", 836, 387)
 
 
 def solve_quad():
@@ -274,3 +303,11 @@ def solve_dark_castle():
     upgrade(CONST_UPG_TOP, placed_monkeys["alch"])
     wait_for_round(39)
     wait_for_victory(27)
+
+
+def solve_muddy_puddles():
+    dart1 = Monkey("dart", 836, 387)
+
+
+def solve_ouch():
+    dart1 = Monkey("dart", 836, 387)
