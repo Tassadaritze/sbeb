@@ -143,7 +143,7 @@ def main():
             utils.click()
             sleep(0.3)
             utils.click()
-            sleep(5)
+            sleep(8)
             solutions.start_game()
             solutions.solve(get_map(page, *match))
             nav_victory_to_main()
