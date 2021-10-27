@@ -1,4 +1,5 @@
 import random
+import sys
 from time import sleep
 
 import cv2 as cv
@@ -38,13 +39,13 @@ def get_map(page, x, y):
         index += 2
     if bot_row:
         index += 3
-    while page > 1:
-        index + 6
+    while page > 0:
+        index += 6
         page -= 1
 
+    print("Loading solution for " + expert_maps[index])
+
     return expert_maps[index]
-
-
 
 
 # navigates from main menu to one of the expert map screens
@@ -108,65 +109,64 @@ def take_screenshot():
         sct.shot()
 
 
-print("The program will take single screenshots of your first monitor for navigation purposes\n")
+def test_func():
+    print("asdf lol")
 
-# solutions.Monkey("dart", 834, 850)
-# solutions.Monkey("dart", 835, 925)
 
-keyboard.wait("enter")
+def main():
+    print("The program will take single screenshots of your first monitor for navigation purposes\n")
 
-# open_chest()
-# print(solutions.find_cash())
-solutions.solve("sanctuary")
-# find_round()
+    # solutions.Monkey("dart", 834, 850)
+    # solutions.Monkey("dart", 835, 925)
 
-# input("Open BTD6 main menu on monitor 1, then press any key to continue")
+    print("Navigate to Bloons TD 6 main menu on monitor 1, then press Enter to continue")
+    # press enter after opening bloons on the main menu
+    keyboard.wait("enter")
 
-# press enter after opening bloons on the main menu
-keyboard.wait('enter')
-nav_main_to_expert()
+    # open_chest()
+    # print(solutions.find_cash())
+    # solutions.solve("sanctuary")
+    # print(solutions.find_round())
+    
+    # keyboard.wait("enter")
 
-match = False
+    # input("Open BTD6 main menu on monitor 1, then press any key to continue")
 
-""" for i in match:
-    end = 0
-    end = end + len(match[i])
-    while end == 0:
-        rand_click()
-        sleep(0.5)
-        match += match_template(scrn, CONST_BONUS_TEMPLATE)
-        print(match) """
 
-""" for pt in zip(*match[::-1]):
-    wa.SetCursorPos(pt)
-    cv.rectangle(scrn, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
-    rand_click() """
+    while True:
+        nav_main_to_expert()
 
-page = 0
+        match = False
+        page = 0
 
-while not match:
-    take_screenshot()
-    # read in screenshot from file in grayscale
-    menu_screenshot = cv.imread("monitor-1.png", cv.IMREAD_GRAYSCALE)
-    match = match_template(menu_screenshot, CONST_BONUS_TEMPLATE)
-    utils.click()
-    sleep(0.3)
-    page = (page + 1) % CONST_NUMBER_OF_EXPERT_MAP_SCREENS
-else:
-    utils.click()
-    sleep(0.3)
-    utils.move_cursor(*match)
-    utils.click()
-    sleep(0.3)
-    utils.move_cursor(632, 582)
-    utils.click()
-    sleep(0.3)
-    utils.click()
-    sleep(5)
-    solutions.start_game()
-    solutions.solve(get_map(page, *match))
-    nav_victory_to_main()
-    open_chest()
+        while not match:
+            take_screenshot()
+            # read in screenshot from file in grayscale
+            menu_screenshot = cv.imread("monitor-1.png", cv.IMREAD_GRAYSCALE)
+            cv.imwrite("gigatest.png", menu_screenshot)
+            match = match_template(menu_screenshot, CONST_BONUS_TEMPLATE)
+            utils.click()
+            sleep(0.3)
+            page = (page + 1) % CONST_NUMBER_OF_EXPERT_MAP_SCREENS
+        else:
+            utils.click()
+            sleep(0.3)
+            utils.move_cursor(*match)
+            utils.click()
+            sleep(0.3)
+            utils.move_cursor(632, 582)
+            utils.click()
+            sleep(0.3)
+            utils.click()
+            sleep(5)
+            solutions.start_game()
+            solutions.solve(get_map(page, *match))
+            nav_victory_to_main()
+            open_chest()
 
-# writes screen
-# cv.imwrite('res.png', screenshot)
+    # writes screen
+    # cv.imwrite('res.png', screenshot)
+    return
+
+
+main()

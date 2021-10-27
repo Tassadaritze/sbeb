@@ -114,7 +114,7 @@ def find_cash():
 """
 
 
-# returns current cash
+# returns current cash or -1 if template matching fails
 def find_cash():
     utils.take_screenshot()
     screenshot = cv.imread("monitor-1.png", cv.IMREAD_GRAYSCALE)
@@ -161,7 +161,8 @@ def wait_for_cash(amount):
         return
 
 
-# returns current round or -1 if OCR fails
+# returns current round or -1 if OCR fails (deprecated in favour of a non-ML approach)
+"""
 def find_round():
     utils.take_screenshot()
     screenshot = cv.imread("monitor-1.png")
@@ -180,6 +181,41 @@ def find_round():
     except ValueError:
         print("Could not recognise round value")
         return -1
+"""
+
+
+# returns current round or -1 if template matching fails
+def find_round():
+    utils.take_screenshot()
+    screenshot = cv.imread("monitor-1.png", cv.IMREAD_GRAYSCALE)
+    thresh = cv.adaptiveThreshold(screenshot, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 7, 2)
+    round_crop = thresh[30:70, 1420:1484]
+    digits = {}
+    for i in range(10):
+        digit = cv.imread("numbers/" + str(i) + ".png", cv.IMREAD_GRAYSCALE)
+        cv.imwrite("roundtest.png", digit)
+        w, h = digit.shape[::-1]                                      # Dimensions of input template, only 2 arguments because image is grayscale
+        match = cv.matchTemplate(round_crop, digit, cv.TM_CCOEFF_NORMED)
+        threshold = 0.75
+        loc = np.where(match >= threshold)                            # NumPy is a fuck
+        last_x = False
+        loc[1].sort()
+        true_loc = loc[1].tolist()                                    # Have to convert NumPy array to a normal fucking list
+        for x in loc[1]:                                              # Goes through list of x-coordinates of matched points
+            if isinstance(last_x, np.int64) and x - last_x < w // 2:  # Checks if last_x is a NumPy int64 and if it's too close to the next element
+                true_loc.pop(true_loc.index(last_x))                  # Removes last_x from list if it's too close to the next element
+            last_x = x                                                # Sets last_x up for next iteration and we go agane
+        digits.update(dict.fromkeys(true_loc, i))
+        cv.imwrite("round.png", round_crop)
+    sorted_digits = sorted(digits.items())
+    sorted_digits = [str(x[1]) for x in sorted_digits]
+    try:
+        found_round = int("".join(sorted_digits))
+        return found_round
+    except ValueError:
+        print("Could not recognise cash value")
+        return -1
+
 
 
 def wait_for_round(number):
