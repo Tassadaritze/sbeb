@@ -23,7 +23,7 @@ CONST_INSTA_TRIO_3_BTN_LOC = [1256, 535]
 CONST_CONTINUE_BTN_LOC = [950, 1000]
 CONST_CANCEL_BTN_LOC = [780, 730]
 CONST_NUMBER_OF_EXPERT_MAP_SCREENS = 2
-CONST_BONUS_TEMPLATE = cv.imread("bonus.png", cv.IMREAD_GRAYSCALE)  # thing to find
+CONST_BONUS_TEMPLATE = cv.imread("bonus/pumpkin.png", cv.IMREAD_GRAYSCALE)  # thing to find
 
 
 def get_map(page, x, y):
@@ -124,6 +124,8 @@ def main():
     # solutions.Monkey("dart", 835, 925)
 
     print("Navigate to Bloons TD 6 main menu on monitor 1, then press Enter to continue")
+    # print("Press Alt+1 to exit the program (hopefully)")
+    # keyboard.add_hotkey("alt+1", lambda: sys.exit(0), suppress=True)
     # press enter after opening bloons on the main menu
     keyboard.wait("enter")
 

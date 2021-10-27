@@ -1,2 +1,8 @@
 config.py
 debug/
+__pycache__/
+.idea/
+.vscode/
+build/
+dist/
+/*.png
