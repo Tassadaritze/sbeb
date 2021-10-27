@@ -15,8 +15,11 @@ CONST_EXPERT_BTN_LOC = [1300, 1000]
 CONST_NEXT_BTN_LOC = [960, 910]
 CONST_HOME_BTN_LOC = [700, 850]
 CONST_CHEST_BTN_LOC = [965, 395]
-CONST_INSTA1_BTN_LOC = [810, 550]
-CONST_INSTA2_BTN_LOC = [1110, 550]
+CONST_INSTA_DUO_1_BTN_LOC = [810, 550]
+CONST_INSTA_DUO_2_BTN_LOC = [1110, 550]
+CONST_INSTA_TRIO_1_BTN_LOC = [656, 535]
+CONST_INSTA_TRIO_2_BTN_LOC = [956, 535]
+CONST_INSTA_TRIO_3_BTN_LOC = [1256, 535]
 CONST_CONTINUE_BTN_LOC = [950, 1000]
 CONST_CANCEL_BTN_LOC = [780, 730]
 CONST_NUMBER_OF_EXPERT_MAP_SCREENS = 2
@@ -69,20 +72,23 @@ def nav_victory_to_main():
     sleep(5)
 
 
+def reveal_insta(insta_position):
+    wa.SetCursorPos(insta_position)
+    utils.click()
+    sleep(0.3)
+    utils.click()
+    sleep(0.3)
+
+
 def open_chest():
     wa.SetCursorPos(CONST_CHEST_BTN_LOC)
     utils.click()
     sleep(0.3)
-    wa.SetCursorPos(CONST_INSTA1_BTN_LOC)
-    utils.click()
-    sleep(0.3)
-    utils.click()
-    sleep(0.3)
-    wa.SetCursorPos(CONST_INSTA2_BTN_LOC)
-    utils.click()
-    sleep(0.3)
-    utils.click()
-    sleep(0.3)
+    reveal_insta(CONST_INSTA_TRIO_1_BTN_LOC)
+    reveal_insta(CONST_INSTA_DUO_1_BTN_LOC)
+    reveal_insta(CONST_INSTA_TRIO_2_BTN_LOC)
+    reveal_insta(CONST_INSTA_DUO_2_BTN_LOC)
+    reveal_insta(CONST_INSTA_TRIO_3_BTN_LOC)
     wa.SetCursorPos(CONST_CONTINUE_BTN_LOC)
     utils.click()
     sleep(0.3)
@@ -125,12 +131,12 @@ def main():
     # press enter after opening bloons on the main menu
     keyboard.wait("enter")
 
-    # open_chest()
+    open_chest()
     # print(solutions.find_cash())
     # solutions.solve("sanctuary")
     # print(solutions.find_round())
     
-    # keyboard.wait("enter")
+    keyboard.wait("enter")
 
     # input("Open BTD6 main menu on monitor 1, then press any key to continue")
 
