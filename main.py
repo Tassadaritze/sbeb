@@ -5,7 +5,6 @@ from time import sleep
 import cv2 as cv
 import keyboard
 import win32api as wa
-from mss import mss
 
 import solutions
 import utils
@@ -114,24 +113,12 @@ def match_template(img, tmpl):
 def main():
     print("The program will take single screenshots of your first monitor for navigation purposes\n")
 
-    # solutions.Monkey("dart", 834, 850)
-    # solutions.Monkey("dart", 835, 925)
-
     print("Navigate to Bloons TD 6 main menu on monitor 1, then press Enter to continue")
     # print("Press Alt+1 to exit the program (hopefully)")
     # keyboard.add_hotkey("alt+1", lambda: sys.exit(0), suppress=True)
+
     # press enter after opening bloons on the main menu
     keyboard.wait("enter")
-
-    # open_chest()
-    # print(solutions.find_cash())
-    # solutions.solve("sanctuary")
-    # print(solutions.find_round())
-    
-    # keyboard.wait("enter")
-
-    # input("Open BTD6 main menu on monitor 1, then press any key to continue")
-
 
     while True:
         nav_main_to_expert()
