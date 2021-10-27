@@ -27,4 +27,4 @@ def press(button):
 # saves screenshot to "monitor-1.png"
 def take_screenshot():
     with mss() as sct:
-        sct.shot()
+        sct.shot(output="screenshots/monitor1.png")

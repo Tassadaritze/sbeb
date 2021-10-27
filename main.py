@@ -111,12 +111,6 @@ def match_template(img, tmpl):
         return False
 
 
-# saves screenshot to "monitor-1.png"
-def take_screenshot():
-    with mss() as sct:
-        sct.shot()
-
-
 def main():
     print("The program will take single screenshots of your first monitor for navigation purposes\n")
 
@@ -147,10 +141,9 @@ def main():
 
         while not match:
             sleep(0.3)
-            take_screenshot()
+            utils.take_screenshot()
             # read in screenshot from file in grayscale
-            menu_screenshot = cv.imread("monitor-1.png", cv.IMREAD_GRAYSCALE)
-            cv.imwrite("gigatest.png", menu_screenshot)
+            menu_screenshot = cv.imread("screenshots/monitor1.png", cv.IMREAD_GRAYSCALE)
             match = match_template(menu_screenshot, CONST_BONUS_TEMPLATE)
             if not match:
                 utils.click()
@@ -168,9 +161,6 @@ def main():
             solutions.solve(get_map(page, *match))
             nav_victory_to_main()
             open_chest()
-
-    # writes screen
-    # cv.imwrite('res.png', screenshot)
     return
 
 

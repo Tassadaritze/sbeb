@@ -90,7 +90,7 @@ def upgrade(path, position):
 """
 def find_cash():
     utils.take_screenshot()
-    screenshot = cv.imread("monitor-1.png")
+    screenshot = cv.imread("screenshots/monitor1.png")
     # screenshot = cv.medianBlur(screenshot, 5)
     gray = cv.cvtColor(screenshot, cv.COLOR_BGR2GRAY)
     thresh = cv.threshold(gray, 220, 255, cv.THRESH_BINARY_INV)[1]
@@ -117,14 +117,12 @@ def find_cash():
 # returns current cash or -1 if template matching fails
 def find_cash():
     utils.take_screenshot()
-    screenshot = cv.imread("monitor-1.png", cv.IMREAD_GRAYSCALE)
+    screenshot = cv.imread("screenshots/monitor1.png", cv.IMREAD_GRAYSCALE)
     thresh = cv.adaptiveThreshold(screenshot, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 7, 2)
     cash_crop = thresh[20:65, 345:530]
-    # cv.imwrite('cash.png', cash_crop)
     digits = {}
     for i in range(10):
         digit = cv.imread("numbers/" + str(i) + ".png", cv.IMREAD_GRAYSCALE)
-        cv.imwrite("cashtest.png", digit)
         w, h = digit.shape[::-1]                                      # Dimensions of input template, only 2 arguments because image is grayscale
         match = cv.matchTemplate(cash_crop, digit, cv.TM_CCOEFF_NORMED)
         threshold = 0.75
@@ -137,12 +135,11 @@ def find_cash():
                 true_loc.pop(true_loc.index(last_x))                  # Removes last_x from list if it's too close to the next element
             last_x = x                                                # Sets last_x up for next iteration and we go agane
         digits.update(dict.fromkeys(true_loc, i))
-        cv.imwrite("cash.png", cash_crop)
     sorted_digits = sorted(digits.items())
     sorted_digits = [str(x[1]) for x in sorted_digits]
     try:
         found_cash = int("".join(sorted_digits))
-        cv.imwrite("debug/" + str(found_cash) + ".png", cash_crop)
+        # cv.imwrite("debug/" + str(found_cash) + ".png", cash_crop)
         return found_cash
     except ValueError:
         print("Could not recognise cash value")
@@ -165,7 +162,7 @@ def wait_for_cash(amount):
 """
 def find_round():
     utils.take_screenshot()
-    screenshot = cv.imread("monitor-1.png")
+    screenshot = cv.imread("screenshots/monitor1.png")
     gray = cv.cvtColor(screenshot, cv.COLOR_BGR2GRAY)
     thresh = cv.threshold(gray, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU)[1]
     round_crop = thresh[30:65, 1430:1485]  # crop
@@ -187,13 +184,12 @@ def find_round():
 # returns current round or -1 if template matching fails
 def find_round():
     utils.take_screenshot()
-    screenshot = cv.imread("monitor-1.png", cv.IMREAD_GRAYSCALE)
+    screenshot = cv.imread("screenshots/monitor1.png", cv.IMREAD_GRAYSCALE)
     thresh = cv.adaptiveThreshold(screenshot, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 7, 2)
     round_crop = thresh[28:70, 1420:1486]
     digits = {}
     for i in range(10):
         digit = cv.imread("numbers/" + str(i) + ".png", cv.IMREAD_GRAYSCALE)
-        cv.imwrite("roundtest.png", digit)
         w, h = digit.shape[::-1]                                      # Dimensions of input template, only 2 arguments because image is grayscale
         match = cv.matchTemplate(round_crop, digit, cv.TM_CCOEFF_NORMED)
         threshold = 0.75
@@ -206,7 +202,6 @@ def find_round():
                 true_loc.pop(true_loc.index(last_x))                  # Removes last_x from list if it's too close to the next element
             last_x = x                                                # Sets last_x up for next iteration and we go agane
         digits.update(dict.fromkeys(true_loc, i))
-        cv.imwrite("round.png", round_crop)
     sorted_digits = sorted(digits.items())
     sorted_digits = [str(x[1]) for x in sorted_digits]
     try:
