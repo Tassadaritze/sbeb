@@ -117,10 +117,6 @@ def take_screenshot():
         sct.shot()
 
 
-def test_func():
-    print("asdf lol")
-
-
 def main():
     print("The program will take single screenshots of your first monitor for navigation purposes\n")
 
@@ -131,12 +127,12 @@ def main():
     # press enter after opening bloons on the main menu
     keyboard.wait("enter")
 
-    open_chest()
+    # open_chest()
     # print(solutions.find_cash())
     # solutions.solve("sanctuary")
     # print(solutions.find_round())
     
-    keyboard.wait("enter")
+    # keyboard.wait("enter")
 
     # input("Open BTD6 main menu on monitor 1, then press any key to continue")
 
