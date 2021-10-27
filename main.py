@@ -1,5 +1,6 @@
 import random
 import sys
+import os
 from time import sleep
 
 import cv2 as cv
@@ -111,7 +112,7 @@ def match_template(img, tmpl):
 
 
 def main():
-    print("The program will take single screenshots of your first monitor for navigation purposes\n")
+    print("The program will take and store single screenshots of your first monitor for navigation purposes\n")
 
     print("Navigate to Bloons TD 6 main menu on monitor 1, then press Enter to continue")
     # print("Press Alt+1 to exit the program (hopefully)")
@@ -119,6 +120,10 @@ def main():
 
     # press enter after opening bloons on the main menu
     keyboard.wait("enter")
+    
+    screenshot_path = "screenshots"
+    if not os.path.exists(screenshot_path):
+        os.makedirs(screenshot_path)
 
     while True:
         nav_main_to_expert()
