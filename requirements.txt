@@ -1,0 +1,5 @@
+keyboard==0.13.5
+mss==6.1.0
+numpy==1.21.3
+opencv-python==4.5.4.58
+pywin32==302
