@@ -189,7 +189,7 @@ def find_round():
     utils.take_screenshot()
     screenshot = cv.imread("monitor-1.png", cv.IMREAD_GRAYSCALE)
     thresh = cv.adaptiveThreshold(screenshot, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 7, 2)
-    round_crop = thresh[30:70, 1420:1484]
+    round_crop = thresh[28:70, 1420:1486]
     digits = {}
     for i in range(10):
         digit = cv.imread("numbers/" + str(i) + ".png", cv.IMREAD_GRAYSCALE)
