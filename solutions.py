@@ -2,7 +2,6 @@ import logging as log
 from time import sleep
 
 import cv2 as cv
-from keyboard import wait
 import numpy as np
 import pytesseract
 
