@@ -25,8 +25,8 @@ CONST_BONUS_TEMPLATE = cv.imread("bonus.png", cv.IMREAD_GRAYSCALE)  # thing to f
 
 def get_map(page, x, y):
     index = 0
-    expert_maps = ["sanctuary", "ravine", "flooded_valley", "infernal", "bloody_puddles",
-     "workshop", "quad", "dark_castle", "muddy_puddles", "ouch"]
+    expert_maps = ["sanctuary", "ravine", "flooded_valley", "infernal", "bloody_puddles", \
+                    "workshop", "quad", "dark_castle", "muddy_puddles", "ouch"]
     top_row = y >= 120 and y <= 410
     bot_row = y >= 434 and y <= 723
     first_col = x >= 355 and x <= 717
@@ -86,6 +86,8 @@ def open_chest():
     wa.SetCursorPos(CONST_CONTINUE_BTN_LOC)
     utils.click()
     sleep(0.3)
+    utils.click()
+    sleep(0.3)
     utils.press('escape')
     sleep(0.3)
     wa.SetCursorPos(CONST_CANCEL_BTN_LOC)
@@ -140,17 +142,16 @@ def main():
         page = 0
 
         while not match:
+            sleep(0.3)
             take_screenshot()
             # read in screenshot from file in grayscale
             menu_screenshot = cv.imread("monitor-1.png", cv.IMREAD_GRAYSCALE)
             cv.imwrite("gigatest.png", menu_screenshot)
             match = match_template(menu_screenshot, CONST_BONUS_TEMPLATE)
-            utils.click()
-            sleep(0.3)
-            page = (page + 1) % CONST_NUMBER_OF_EXPERT_MAP_SCREENS
+            if not match:
+                utils.click()
+                page = (page + 1) % CONST_NUMBER_OF_EXPERT_MAP_SCREENS
         else:
-            utils.click()
-            sleep(0.3)
             utils.move_cursor(*match)
             utils.click()
             sleep(0.3)

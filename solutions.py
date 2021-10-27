@@ -213,7 +213,7 @@ def find_round():
         found_round = int("".join(sorted_digits))
         return found_round
     except ValueError:
-        print("Could not recognise cash value")
+        print("Could not recognise round value")
         return -1
 
 
@@ -279,7 +279,7 @@ def solve_sanctuary():
     utils.press(hotkeys[CONST_UPG_BOT])
     utils.press("escape")
     wait_for_round(39)
-    wait_for_victory(25)
+    wait_for_victory(20)
 
 
 def solve_ravine():
@@ -316,7 +316,7 @@ def solve_ravine():
     sniper1.upgrade(CONST_UPG_BOT)
     sniper1.upgrade(CONST_UPG_BOT)
     wait_for_round(39)
-    wait_for_victory(25)
+    wait_for_victory(20)
 
 
 def solve_flooded_valley():
@@ -348,7 +348,7 @@ def solve_flooded_valley():
     wait_for_cash(2550)
     sub1.upgrade(CONST_UPG_BOT)
     wait_for_round(39)
-    wait_for_victory(25)
+    wait_for_victory(20)
 
 
 def solve_infernal():
@@ -379,7 +379,7 @@ def solve_infernal():
     wait_for_cash(2550)
     sub1.upgrade(CONST_UPG_BOT)
     wait_for_round(39)
-    wait_for_victory(25)
+    wait_for_victory(20)
 
 
 def solve_bloody_puddles():
@@ -421,7 +421,7 @@ def solve_bloody_puddles():
     wait_for_cash(2550)
     sub1.upgrade(CONST_UPG_BOT)
     wait_for_round(39)
-    wait_for_victory(25)
+    wait_for_victory(20)
 
 
 def solve_workshop():
@@ -452,7 +452,7 @@ def solve_workshop():
     wait_for_cash(510)
     spac1.upgrade(CONST_UPG_TOP)
     wait_for_round(39)
-    wait_for_victory(25)
+    wait_for_victory(20)
 
 
 def solve_quad():
@@ -490,7 +490,7 @@ def solve_quad():
     wait_for_cash(3610)
     sniper1.upgrade(CONST_UPG_BOT)
     wait_for_round(39)
-    wait_for_victory(25)
+    wait_for_victory(20)
 
 
 def solve_dark_castle():
@@ -532,7 +532,7 @@ def solve_dark_castle():
     upgrade(CONST_UPG_BOT, placed_monkeys["sub"])
     upgrade(CONST_UPG_TOP, placed_monkeys["alch"])
     wait_for_round(39)
-    wait_for_victory(27)
+    wait_for_victory(20)
 
 
 def solve_muddy_puddles():
@@ -566,7 +566,7 @@ def solve_muddy_puddles():
     wait_for_cash(2550)
     sub1.upgrade(CONST_UPG_BOT)
     wait_for_round(39)
-    wait_for_victory(25)
+    wait_for_victory(20)
 
 
 def solve_ouch():
@@ -602,4 +602,4 @@ def solve_ouch():
     wait_for_cash(2550)
     sub1.upgrade(CONST_UPG_BOT)
     wait_for_round(39)
-    wait_for_victory(25)
+    wait_for_victory(20)
