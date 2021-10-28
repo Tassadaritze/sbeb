@@ -83,7 +83,7 @@ def reveal_insta(insta_position):
 def open_chest():
     wa.SetCursorPos(CONST_CHEST_BTN_LOC)
     utils.click()
-    sleep(0.3)
+    sleep(0.6)
     reveal_insta(CONST_INSTA_TRIO_1_BTN_LOC)
     reveal_insta(CONST_INSTA_DUO_1_BTN_LOC)
     reveal_insta(CONST_INSTA_TRIO_2_BTN_LOC)
