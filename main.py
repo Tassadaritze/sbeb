@@ -1,34 +1,33 @@
+import os
 import random
 import sys
-import os
 from time import sleep
 
 import cv2 as cv
 import keyboard
-import win32api as wa
 
 import solutions
-import utils
+from utils import click, move_cursor, press, take_screenshot
 
-CONST_PLAY_BTN_LOC = [800, 950]
-CONST_EXPERT_BTN_LOC = [1300, 1000]
-CONST_NEXT_BTN_LOC = [960, 910]
-CONST_HOME_BTN_LOC = [700, 850]
-CONST_CHEST_BTN_LOC = [965, 395]
-CONST_INSTA_DUO_1_BTN_LOC = [810, 550]
-CONST_INSTA_DUO_2_BTN_LOC = [1110, 550]
-CONST_INSTA_TRIO_1_BTN_LOC = [656, 535]
-CONST_INSTA_TRIO_2_BTN_LOC = [956, 535]
-CONST_INSTA_TRIO_3_BTN_LOC = [1256, 535]
-CONST_CONTINUE_BTN_LOC = [950, 1000]
-CONST_CANCEL_BTN_LOC = [780, 730]
-CONST_NUMBER_OF_EXPERT_MAP_SCREENS = 2
-CONST_BONUS_TEMPLATE = cv.imread("bonus/pumpkin.png", cv.IMREAD_GRAYSCALE)  # thing to find
+PLAY_BTN_LOC = (800, 950)
+EXPERT_BTN_LOC = (1300, 1000)
+NEXT_BTN_LOC = (960, 910)
+HOME_BTN_LOC = (700, 850)
+CHEST_BTN_LOC = (965, 395)
+INSTA_DUO_1_BTN_LOC = (810, 550)
+INSTA_DUO_2_BTN_LOC = (1110, 550)
+INSTA_TRIO_1_BTN_LOC = (656, 535)
+INSTA_TRIO_2_BTN_LOC = (956, 535)
+INSTA_TRIO_3_BTN_LOC = (1256, 535)
+CONTINUE_BTN_LOC = (950, 1000)
+CANCEL_BTN_LOC = (780, 730)
+NUMBER_OF_EXPERT_MAP_SCREENS = 2
+BONUS_TEMPLATE = cv.imread("bonus/pumpkin.png", cv.IMREAD_GRAYSCALE)  # image of current bonus event marker
 
 
 def get_map(page, x, y):
     index = 0
-    expert_maps = ["sanctuary", "ravine", "flooded_valley", "infernal", "bloody_puddles", \
+    EXPERT_MAPS = ["sanctuary", "ravine", "flooded_valley", "infernal", "bloody_puddles", \
                     "workshop", "quad", "dark_castle", "muddy_puddles", "ouch"]
     top_row = y >= 120 and y <= 410
     bot_row = y >= 434 and y <= 723
@@ -46,58 +45,58 @@ def get_map(page, x, y):
         index += 6
         page -= 1
 
-    print("Loading solution for " + expert_maps[index])
+    print("Loading solution for " + EXPERT_MAPS[index])
 
-    return expert_maps[index]
+    return EXPERT_MAPS[index]
 
 
 # navigates from main menu to one of the expert map screens
 def nav_main_to_expert():
-    wa.SetCursorPos(CONST_PLAY_BTN_LOC)
-    utils.click()
+    move_cursor(*PLAY_BTN_LOC)
+    click()
     slp = random.randrange(904, 1473)
     sleep(slp / 1000)
-    wa.SetCursorPos(CONST_EXPERT_BTN_LOC)
-    utils.click()
+    move_cursor(*EXPERT_BTN_LOC)
+    click()
     sleep(0.3)
 
 
 def nav_victory_to_main():
-    wa.SetCursorPos(CONST_NEXT_BTN_LOC)
-    utils.click()
+    move_cursor(*NEXT_BTN_LOC)
+    click()
     slp = random.randrange(904, 1473)
     sleep(slp / 1000)
-    wa.SetCursorPos(CONST_HOME_BTN_LOC)
-    utils.click()
+    move_cursor(*HOME_BTN_LOC)
+    click()
     sleep(5)
 
 
 def reveal_insta(insta_position):
-    wa.SetCursorPos(insta_position)
-    utils.click()
+    move_cursor(*insta_position)
+    click()
     sleep(0.3)
-    utils.click()
+    click()
     sleep(0.3)
 
 
 def open_chest():
-    wa.SetCursorPos(CONST_CHEST_BTN_LOC)
-    utils.click()
+    move_cursor(*CHEST_BTN_LOC)
+    click()
     sleep(0.6)
-    reveal_insta(CONST_INSTA_TRIO_1_BTN_LOC)
-    reveal_insta(CONST_INSTA_DUO_1_BTN_LOC)
-    reveal_insta(CONST_INSTA_TRIO_2_BTN_LOC)
-    reveal_insta(CONST_INSTA_DUO_2_BTN_LOC)
-    reveal_insta(CONST_INSTA_TRIO_3_BTN_LOC)
-    wa.SetCursorPos(CONST_CONTINUE_BTN_LOC)
-    utils.click()
+    reveal_insta(INSTA_TRIO_1_BTN_LOC)
+    reveal_insta(INSTA_DUO_1_BTN_LOC)
+    reveal_insta(INSTA_TRIO_2_BTN_LOC)
+    reveal_insta(INSTA_DUO_2_BTN_LOC)
+    reveal_insta(INSTA_TRIO_3_BTN_LOC)
+    move_cursor(*CONTINUE_BTN_LOC)
+    click()
     sleep(0.3)
-    utils.click()
+    click()
     sleep(0.3)
-    utils.press('escape')
+    press('escape')
     sleep(0.3)
-    wa.SetCursorPos(CONST_CANCEL_BTN_LOC)
-    utils.click()
+    move_cursor(*CANCEL_BTN_LOC)
+    click()
     sleep(0.3)
 
 
@@ -133,21 +132,21 @@ def main():
 
         while not match:
             sleep(0.3)
-            utils.take_screenshot()
+            take_screenshot()
             # read in screenshot from file in grayscale
             menu_screenshot = cv.imread("screenshots/monitor1.png", cv.IMREAD_GRAYSCALE)
-            match = match_template(menu_screenshot, CONST_BONUS_TEMPLATE)
+            match = match_template(menu_screenshot, BONUS_TEMPLATE)
             if not match:
-                utils.click()
-                page = (page + 1) % CONST_NUMBER_OF_EXPERT_MAP_SCREENS
+                click()
+                page = (page + 1) % NUMBER_OF_EXPERT_MAP_SCREENS
         else:
-            utils.move_cursor(*match)
-            utils.click()
+            move_cursor(*match)
+            click()
             sleep(0.3)
-            utils.move_cursor(632, 582)
-            utils.click()
+            move_cursor(632, 582)
+            click()
             sleep(0.3)
-            utils.click()
+            click()
             sleep(8)
             solutions.start_game()
             solutions.solve(get_map(page, *match))
