@@ -2,6 +2,7 @@ import logging as log
 from time import sleep
 
 import cv2 as cv
+from mss import base
 import numpy as np
 
 from config import hotkeys
@@ -12,22 +13,51 @@ UPG_MID = "upg_mid"
 UPG_BOT = "upg_bot"
 
 
+MONKEY_COSTS = {
+    "dart": {"base": 170, UPG_TOP: (120, 185, 255, 1530, 12750), UPG_MID: (85, 160, 340, 6800, 38250), UPG_BOT: (75, 170, 530, 1700, 21250)},
+    "boomer": "w",
+    "bomb": "e",
+    "tack": "r",
+    "ice": "t",
+    "glue": "z",
+    "sniper": {"base": 285, UPG_TOP: (295, 1275, 2550, 3250, 28900), UPG_MID: (255, 380, 2720, 6120, 11050), UPG_BOT: (340, 340, 2975, 3610, 11900)},
+    "sub": {"base": 275, UPG_TOP: (110, 425, 425, 2125, 27200), UPG_MID: (380, 255, 1190, 11050, 27200), UPG_BOT: (380, 850, 935, 2550, 21250)},
+    "bucc": "c",
+    "ace": {"base": 645, UPG_TOP: (550, 550, 850, 2550, 30600), UPG_MID: (170, 295, 765, 11900, 26775), UPG_BOT: (425, 255, 1870, 20400, 76500)},
+    "heli": "b",
+    "mortar": "n",
+    "dartling": "m",
+    "wizard": {"base": 340, UPG_TOP: (100, 510, 1105, 9265, 27200), UPG_MID: (255, 765, 2550, 3400, 45900), UPG_BOT: (230, 255, 1445, 2380, 20400)},
+    "super": "s",
+    "ninja": "d",
+    "alch": {"base": 470, UPG_TOP: (210, 295, 1060, 2550, 51000), UPG_MID: (210, 405, 2550, 3825, 38250), UPG_BOT: (550, 380, 850, 2335, 34000)},
+    "druid": "g",
+    "farm": "h",
+    "spac": {"base": 850, UPG_TOP: (680, 510, 1955, 6575, 127500), UPG_MID: (510, 680, 2125, 4250, 34000), UPG_BOT: (125, 340, 1190, 2975, 25500)},
+    "village": "k",
+    "engi": "l",
+    "hero": {"base": 920},
+}
+
 class Monkey:
     def __init__(self, type, x, y):
         self.type = type
         self.x = x
         self.y = y
-        self.upgrades = [0, 0, 0]
+        self.upgrades = {UPG_TOP: 0, UPG_MID: 0, UPG_BOT: 0}
         self.target = 0
         self.targets = ["first", "last", "close", "strong"]
+        self.costs = MONKEY_COSTS[type]
         self.place()
 
 
     def place(self):
+        wait_for_cash(self.costs["base"])
         move_cursor(self.x, self.y)
         desired_key = hotkeys[self.type]
         press(desired_key)
         click()
+        self.identify()
     
 
     def select(self):
@@ -39,10 +69,18 @@ class Monkey:
         if [UPG_TOP, UPG_MID, UPG_BOT].count(path) == 0:
             log.error("Tried to upgrade using invalid hotkey")
         else:
+            wait_for_cash(self.get_upgrade_costs(path))
             self.select()
             press(hotkeys[path])
             press("esc")
+            self.upgrades[path] += 1
+            self.identify()
     
+
+    def get_upgrade_costs(self, path):
+        next_upgrade = self.upgrades[path]
+        return self.costs[path][next_upgrade]
+
 
     def set_targeting(self, desired_targeting):
         if self.targets.count(desired_targeting) == 0:
@@ -60,13 +98,15 @@ class Monkey:
         self.x >= 835
 
 
-    def print_type(self):
-        print("I am a " + self.type)
+    def identify(self):
+        print(f"I am a {self.upgrades[UPG_TOP]}/{self.upgrades[UPG_MID]}/{self.upgrades[UPG_BOT]} {self.type}")
+
 
 
 def start_game():
+    wait_for_cash(850)
     press(hotkeys["play_ff"])
-    sleep(0.5)
+    sleep(0.3)
     press(hotkeys["play_ff"])
 
 
@@ -237,14 +277,13 @@ def set_targeting(position):
 
 
 def solve(map):
+    start_game()
     eval("solve_" + map + "()")
 
 
 # hardcoded solution, because of moving parts of the map
 def solve_sanctuary():
-    wait_for_cash(920)
     Monkey("hero", 833, 150)
-    wait_for_cash(185)
     Monkey("sniper", 256, 964)
     click()
     press(hotkeys["targ_prev"])
@@ -269,32 +308,20 @@ def solve_sanctuary():
 
 def solve_ravine():
     dart1 = Monkey("dart", 1353, 266)
-    wait_for_cash(920)
     Monkey("hero", 703, 109)
-    wait_for_cash(420)
     ace1 = Monkey("ace", 534, 829)
-    wait_for_cash(425)
     ace1.upgrade(UPG_BOT)
-    wait_for_cash(255)
     ace1.upgrade(UPG_BOT)
-    wait_for_cash(1870)
     ace1.upgrade(UPG_BOT)
-    wait_for_cash(470)
     alch1 = Monkey("alch", 359, 814)
-    wait_for_cash(505)
     alch1.upgrade(UPG_TOP)
     alch1.upgrade(UPG_TOP)
-    wait_for_cash(1060)
     alch1.upgrade(UPG_TOP)
-    wait_for_cash(615)
     alch1.upgrade(UPG_MID)
     alch1.upgrade(UPG_MID)
-    wait_for_cash(1100)
     ace1.upgrade(UPG_TOP)
     ace1.upgrade(UPG_TOP)
-    wait_for_cash(2550)
     alch1.upgrade(UPG_TOP)
-    wait_for_cash(1600)
     sniper1 = Monkey("sniper", 123, 887)
     sniper1.upgrade(UPG_MID)
     sniper1.upgrade(UPG_MID)
@@ -305,32 +332,20 @@ def solve_ravine():
 
 
 def solve_flooded_valley():
-    wait_for_cash(920)
     Monkey("hero", 745, 429)
-    wait_for_cash(170)
     sub1 = Monkey("sub", 973, 197)
-    wait_for_cash(380)
     sub1.upgrade(UPG_MID)
-    wait_for_cash(380)
     sub1.upgrade(UPG_BOT)
-    wait_for_cash(850)
     sub1.upgrade(UPG_BOT)
-    wait_for_cash(935)
     sub1.upgrade(UPG_BOT)
-    wait_for_cash(255)
     sub1.upgrade(UPG_MID)
-    wait_for_cash(260)
     sub2 = Monkey("sub", 1011, 841)
-    wait_for_cash(535)
     sub2.upgrade(UPG_TOP)
     sub2.upgrade(UPG_TOP)
-    wait_for_cash(1230)
     sub2.upgrade(UPG_BOT)
     sub2.upgrade(UPG_BOT)
-    wait_for_cash(3485)
     sub2.upgrade(UPG_BOT)
     sub2.upgrade(UPG_BOT)
-    wait_for_cash(2550)
     sub1.upgrade(UPG_BOT)
     wait_for_round(39)
     wait_for_victory(20)
@@ -338,30 +353,20 @@ def solve_flooded_valley():
 
 def solve_infernal():
     dart1 = Monkey("dart", 834, 387)
-    wait_for_cash(920)
     Monkey("hero", 122, 643)
-    wait_for_cash(75)
     dart1.upgrade(UPG_BOT)
-    wait_for_cash(170)
     sub1 = Monkey("sub", 487, 789)
-    wait_for_cash(535)
     sub1.upgrade(UPG_TOP)
     sub1.upgrade(UPG_TOP)
-    wait_for_cash(170)
     dart1.upgrade(UPG_BOT)
-    wait_for_cash(1230)
     sub1.upgrade(UPG_BOT)
     sub1.upgrade(UPG_BOT)
-    wait_for_cash(285)
     sniper1 = Monkey("sniper", 1568, 599)
     sniper1.set_targeting("strong")
-    wait_for_cash(975)
     sniper1.upgrade(UPG_TOP)
     sniper1.upgrade(UPG_BOT)
     sniper1.upgrade(UPG_BOT)
-    wait_for_cash(935)
     sub1.upgrade(UPG_BOT)
-    wait_for_cash(2550)
     sub1.upgrade(UPG_BOT)
     wait_for_round(39)
     wait_for_victory(20)
@@ -369,41 +374,29 @@ def solve_infernal():
 
 def solve_bloody_puddles():
     dart1 = Monkey("dart", 393, 304)
-    wait_for_cash(920)
     Monkey("hero", 836, 434)
-    wait_for_cash(170)
     sub1 = Monkey("sub", 1217, 175)
-    wait_for_cash(535)
     sub1.upgrade(UPG_TOP)
     sub1.upgrade(UPG_TOP)
-    wait_for_cash(170)
     dart2 = Monkey("dart", 939, 354)
-    wait_for_cash(170)
     dart3 = Monkey("dart", 1255, 833)
-    wait_for_cash(380)
     sub1.upgrade(UPG_BOT)
-    wait_for_cash(850)
     sub1.upgrade(UPG_BOT)
-    wait_for_cash(1260)
     sniper1 = Monkey("sniper", 712, 62)
     sniper1.set_targeting("strong")
     sniper1.upgrade(UPG_TOP)
     sniper1.upgrade(UPG_BOT)
     sniper1.upgrade(UPG_BOT)
-    wait_for_cash(735)
     dart1.upgrade(UPG_BOT)
     dart1.upgrade(UPG_BOT)
     dart2.upgrade(UPG_BOT)
     dart2.upgrade(UPG_BOT)
     dart3.upgrade(UPG_BOT)
     dart3.upgrade(UPG_BOT)
-    wait_for_cash(415)
     dart4 = Monkey("dart", 357, 806)
     dart4.upgrade(UPG_BOT)
     dart4.upgrade(UPG_BOT)
-    wait_for_cash(935)
     sub1.upgrade(UPG_BOT)
-    wait_for_cash(2550)
     sub1.upgrade(UPG_BOT)
     wait_for_round(39)
     wait_for_victory(20)
@@ -411,43 +404,25 @@ def solve_bloody_puddles():
 
 def solve_workshop():
     dart1 = Monkey("dart", 920, 502)
-    wait_for_cash(920)
     Monkey("hero", 1214, 267)
-    wait_for_cash(340)
     wiz1 = Monkey("wizard", 1020, 499)
-    wait_for_cash(255)
     wiz1.upgrade(UPG_MID)
-    wait_for_cash(765)
     wiz1.upgrade(UPG_MID)
-    wait_for_cash(230)
     wiz1.upgrade(UPG_BOT)
-    wait_for_cash(255)
     wiz1.upgrade(UPG_BOT)
-    wait_for_cash(700)
     spac1 = Monkey("spac", 1016, 409)
-    wait_for_cash(680)
     spac1.upgrade(UPG_TOP)
-    wait_for_cash(465)
     spac1.upgrade(UPG_BOT)
     spac1.upgrade(UPG_BOT)
-    wait_for_cash(1190)
     spac1.upgrade(UPG_BOT)
-    wait_for_cash(2975)
     spac1.upgrade(UPG_BOT)
-    wait_for_cash(510)
     spac1.upgrade(UPG_TOP)
-    wait_for_cash(850)
     spac2 = Monkey("spac", 1549, 677)
-    wait_for_cash(680)
     spac2.upgrade(UPG_TOP)
-    wait_for_cash(465)
     spac2.upgrade(UPG_BOT)
     spac2.upgrade(UPG_BOT)
-    wait_for_cash(1190)
     spac2.upgrade(UPG_BOT)
-    wait_for_cash(2975)
     spac2.upgrade(UPG_BOT)
-    wait_for_cash(510)
     spac2.upgrade(UPG_TOP)
     wait_for_round(39)
     wait_for_victory(20)
@@ -455,37 +430,23 @@ def solve_workshop():
 
 def solve_quad():
     dart1 = Monkey("dart", 834, 270)
-    wait_for_cash(920)
     Monkey("hero", 1154, 322)
-    wait_for_cash(170)
     sub1 = Monkey("sub", 960, 623)
-    wait_for_cash(340)
     wiz1 = Monkey("wizard", 1267, 598)
-    wait_for_cash(1020)
     wiz1.upgrade(UPG_MID)
     wiz1.upgrade(UPG_MID)
-    wait_for_cash(230)
     wiz1.upgrade(UPG_BOT)
-    wait_for_cash(255)
     wiz1.upgrade(UPG_BOT)
-    wait_for_cash(700)
     spac1 = Monkey("spac", 398, 525)
-    wait_for_cash(680)
     spac1.upgrade(UPG_TOP)
-    wait_for_cash(510)
     spac1.upgrade(UPG_TOP)
-    wait_for_cash(580)
     sniper1 = Monkey("sniper", 840, 714)
     sniper1.set_targeting("strong")
     sniper1.upgrade(UPG_TOP)
-    wait_for_cash(680)
     sniper1.upgrade(UPG_BOT)
     sniper1.upgrade(UPG_BOT)
-    wait_for_cash(1275)
     sniper1.upgrade(UPG_TOP)
-    wait_for_cash(2975)
     sniper1.upgrade(UPG_BOT)
-    wait_for_cash(3610)
     sniper1.upgrade(UPG_BOT)
     wait_for_round(39)
     wait_for_victory(20)
@@ -493,36 +454,23 @@ def solve_quad():
 
 def solve_dark_castle():
     dart1 = Monkey("dart", 577, 491)
-    wait_for_cash(920)
     Monkey("hero", 910, 144)
-    wait_for_cash(170)
     sub1 = Monkey("sub", 1083, 694)
-    wait_for_cash(380)
     sub1.upgrade(UPG_BOT)
-    wait_for_cash(850)
     sub1.upgrade(UPG_BOT)
-    wait_for_cash(535)
     sub1.upgrade(UPG_TOP)
     sub1.upgrade(UPG_TOP)
-    wait_for_cash(245)
     dart1.upgrade(UPG_BOT)
     dart1.upgrade(UPG_BOT)
-    wait_for_cash(935)
     sub1.upgrade(UPG_BOT)
-    wait_for_cash(2550)
     sub1.upgrade(UPG_BOT)
-    wait_for_cash(530)
     dart1.upgrade(UPG_BOT)
-    wait_for_cash(470)
     alch1 = Monkey("alch", 924, 666)
-    wait_for_cash(1700)
     alch1.upgrade(UPG_TOP)
     alch1.upgrade(UPG_TOP)
     alch1.upgrade(UPG_TOP)
-    wait_for_cash(615)
     alch1.upgrade(UPG_MID)
     alch1.upgrade(UPG_MID)
-    wait_for_cash(2550)
     alch1.upgrade(UPG_TOP)
     wait_for_round(39)
     wait_for_victory(20)
@@ -530,33 +478,23 @@ def solve_dark_castle():
 
 def solve_muddy_puddles():
     dart1 = Monkey("dart", 467, 296)
-    wait_for_cash(920)
     Monkey("hero", 980, 690)
-    wait_for_cash(170)
     sub1 = Monkey("sub", 1203, 450)
-    wait_for_cash(535)
     sub1.upgrade(UPG_TOP)
     sub1.upgrade(UPG_TOP)
-    wait_for_cash(380)
     sub1.upgrade(UPG_BOT)
-    wait_for_cash(850)
     sub1.upgrade(UPG_BOT)
-    wait_for_cash(285)
     sniper1 = Monkey("sniper", 1229, 43)
     sniper1.set_targeting("strong")
-    wait_for_cash(975)
     sniper1.upgrade(UPG_TOP)
     sniper1.upgrade(UPG_BOT)
     sniper1.upgrade(UPG_BOT)
-    wait_for_cash(660)
     dart2 = Monkey("dart", 1138, 775)
     dart1.upgrade(UPG_BOT)
     dart1.upgrade(UPG_BOT)
     dart2.upgrade(UPG_BOT)
     dart2.upgrade(UPG_BOT)
-    wait_for_cash(935)
     sub1.upgrade(UPG_BOT)
-    wait_for_cash(2550)
     sub1.upgrade(UPG_BOT)
     wait_for_round(39)
     wait_for_victory(20)
@@ -564,35 +502,23 @@ def solve_muddy_puddles():
 
 def solve_ouch():
     dart1 = Monkey("dart", 666, 507)
-    wait_for_cash(920)
     Monkey("hero", 1133, 322)
-    wait_for_cash(170)
     sub1 = Monkey("sub", 978, 612)
-    wait_for_cash(535)
     sub1.upgrade(UPG_TOP)
     sub1.upgrade(UPG_TOP)
-    wait_for_cash(380)
     sub1.upgrade(UPG_BOT)
-    wait_for_cash(850)
     sub1.upgrade(UPG_BOT)
-    wait_for_cash(245)
     dart1.upgrade(UPG_BOT)
     dart1.upgrade(UPG_BOT)
-    wait_for_cash(530)
     dart1.upgrade(UPG_BOT)
-    wait_for_cash(245)
     dart1.upgrade(UPG_MID)
     dart1.upgrade(UPG_MID)
-    wait_for_cash(285)
     sniper1 = Monkey("sniper", 1023, 324)
     sniper1.set_targeting("strong")
-    wait_for_cash(975)
     sniper1.upgrade(UPG_TOP)
     sniper1.upgrade(UPG_BOT)
     sniper1.upgrade(UPG_BOT)
-    wait_for_cash(935)
     sub1.upgrade(UPG_BOT)
-    wait_for_cash(2550)
     sub1.upgrade(UPG_BOT)
     wait_for_round(39)
     wait_for_victory(20)

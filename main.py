@@ -147,8 +147,6 @@ def main():
             click()
             sleep(0.3)
             click()
-            sleep(8)
-            solutions.start_game()
             solutions.solve(get_map(page, *match))
             nav_victory_to_main()
             open_chest()
