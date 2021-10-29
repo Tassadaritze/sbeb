@@ -123,34 +123,6 @@ def upgrade(path, position):
         press("esc")
 
 
-# returns current cash or -1 if OCR fails (deprecated in favour of a non-ML approach)
-"""
-def find_cash():
-    take_screenshot()
-    screenshot = cv.imread("screenshots/monitor1.png")
-    # screenshot = cv.medianBlur(screenshot, 5)
-    gray = cv.cvtColor(screenshot, cv.COLOR_BGR2GRAY)
-    thresh = cv.threshold(gray, 220, 255, cv.THRESH_BINARY_INV)[1]
-    #,+ cv.THRESH_OTSU)[1]
-    cash_crop = thresh[20:65, 345:500]
-    kernel = np.ones((3,3),np.uint8)
-    cash_crop = cv.erode(cash_crop ,kernel,iterations = 2)
-    cv.imwrite('cash.png', cash_crop)
-
-    custom_oem_psm_config = r'--oem 3 --psm 13'
-    tesseract_out = pytesseract.image_to_string(cash_crop,
-                                                config=custom_oem_psm_config)  # Tesseract does its best to recognise something
-    found_cash_list = [s for s in list(tesseract_out) if s.isdigit()]  # Find digits in what was recognised
-    print(tesseract_out)
-    try:
-        found_cash = int("".join(found_cash_list))
-        return found_cash
-    except ValueError:
-        print("Could not recognise cash value")
-        return -1
-"""
-
-
 # returns current cash or -1 if template matching fails
 def find_cash():
     take_screenshot()
@@ -159,7 +131,7 @@ def find_cash():
     cash_crop = thresh[20:65, 345:530]
     digits = {}
     for i in range(10):
-        digit = cv.imread("numbers/" + str(i) + ".png", cv.IMREAD_GRAYSCALE)
+        digit = cv.imread(f"numbers/{i}.png", cv.IMREAD_GRAYSCALE)
         w, h = digit.shape[::-1]                                      # Dimensions of input template, only 2 arguments because image is grayscale
         match = cv.matchTemplate(cash_crop, digit, cv.TM_CCOEFF_NORMED)
         threshold = 0.75
@@ -176,7 +148,8 @@ def find_cash():
     sorted_digits = [str(x[1]) for x in sorted_digits]
     try:
         found_cash = int("".join(sorted_digits))
-        # cv.imwrite("debug/" + str(found_cash) + ".png", cash_crop)
+        # turn on to gather pictures for debugging
+        # cv.imwrite(f"debug/{found_cash}.png", cash_crop)
         return found_cash
     except ValueError:
         print("Could not recognise cash value")
@@ -195,29 +168,6 @@ def wait_for_cash(amount):
         return
 
 
-# returns current round or -1 if OCR fails (deprecated in favour of a non-ML approach)
-"""
-def find_round():
-    take_screenshot()
-    screenshot = cv.imread("screenshots/monitor1.png")
-    gray = cv.cvtColor(screenshot, cv.COLOR_BGR2GRAY)
-    thresh = cv.threshold(gray, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU)[1]
-    round_crop = thresh[30:65, 1430:1485]  # crop
-    cv.imwrite('round.png', round_crop)
-    custom_oem_psm_config = r'--oem 3 --psm 13'
-    tesseract_out = pytesseract.image_to_string(round_crop,
-                                                config=custom_oem_psm_config)  # Tesseract does its best to recognise something
-    print(tesseract_out)
-    found_round_list = [s for s in list(tesseract_out) if s.isdigit()]  # Find digits in what was recognised
-    try:
-        found_round = int("".join(found_round_list))
-        return found_round
-    except ValueError:
-        print("Could not recognise round value")
-        return -1
-"""
-
-
 # returns current round or -1 if template matching fails
 def find_round():
     take_screenshot()
@@ -226,7 +176,7 @@ def find_round():
     round_crop = thresh[28:70, 1420:1486]
     digits = {}
     for i in range(10):
-        digit = cv.imread("numbers/" + str(i) + ".png", cv.IMREAD_GRAYSCALE)
+        digit = cv.imread(f"numbers/{i}.png", cv.IMREAD_GRAYSCALE)
         w, h = digit.shape[::-1]                                      # Dimensions of input template, only 2 arguments because image is grayscale
         match = cv.matchTemplate(round_crop, digit, cv.TM_CCOEFF_NORMED)
         threshold = 0.75
@@ -249,7 +199,6 @@ def find_round():
         return -1
 
 
-
 def wait_for_round(number):
     sleep(1)
     current_round = find_round()
@@ -263,6 +212,7 @@ def wait_for_round(number):
 
 
 def wait_for_victory(seconds):
+    # go, next = [900, 888], [1024, 935]
     sleep(seconds)
 
 
@@ -522,3 +472,76 @@ def solve_ouch():
     sub1.upgrade(UPG_BOT)
     wait_for_round(39)
     wait_for_victory(20)
+
+
+# DEBUG automatic cash detection with gathered images from find_cash().
+# 1. turn on image saving in find_cash() =>
+# 2. run program for a while
+# 3. rename images where the name doesnt match the number in debug folder to "name"-"number_in_image", e.g. 421-4271 if 7 wasn't detected.
+# 4. run debug_cash()
+# 5. finetune images in numbers folder and/or threshold in find_cash_debug
+"""
+import os
+import re
+
+def debug_cash():
+    still_correct = [0, 0]
+    improved = [0, 0]
+    path = 'debug'
+    dir = sorted(os.listdir(path), key=len)
+    for name in dir :
+        crop = cv.imread(f"debug/{name}", cv.IMREAD_GRAYSCALE)
+        if str.__contains__(name, '-'):
+            found_cash = find_cash_debug(crop)
+            if found_cash > 0:
+                correct_val = re.sub(r'.*-', '', name)[:-4]
+                print(f"{correct_val} == {found_cash}")
+                if correct_val == str(found_cash):
+                    improved[0] += 1
+                    improved[1] += 1
+                else:
+                    improved[1] += 1
+            else:
+                improved[1] += 1
+        elif True:
+            found_cash = find_cash_debug(crop)
+            if found_cash > 0:    
+                # print(f"{n[:-4]} == {found_cash}")
+                if name[:-4] == str(found_cash):
+                    still_correct[0] += 1
+                    still_correct[1] += 1
+                else:
+                    print(f"{name[:-4]} != {found_cash}")
+                    still_correct[1] += 1
+            else:
+                still_correct[1] += 1
+    print(f"Still correct: {still_correct[0]}/{still_correct[1]}")
+    print(f"Now also correct: {improved[0]}/{improved[1]}")
+    
+
+def find_cash_debug(picture):
+    digits = {}
+    for i in range(10):
+        digit = cv.imread(f"numbers/{i}.png", cv.IMREAD_GRAYSCALE)
+        w, h = digit.shape[::-1]                                      # Dimensions of input template, only 2 arguments because image is grayscale
+        match = cv.matchTemplate(picture, digit, cv.TM_CCOEFF_NORMED)
+        threshold = 0.75
+        loc = np.where(match >= threshold)                            # NumPy is a fuck
+        last_x = False
+        loc[1].sort()
+        true_loc = loc[1].tolist()                                    # Have to convert NumPy array to a normal fucking list
+        for x in loc[1]:                                              # Goes through list of x-coordinates of matched points
+            if isinstance(last_x, np.int64) and x - last_x < w // 2:  # Checks if last_x is a NumPy int64 and if it's too close to the next element
+                true_loc.pop(true_loc.index(last_x))                  # Removes last_x from list if it's too close to the next element
+            last_x = x                                                # Sets last_x up for next iteration and we go agane
+        digits.update(dict.fromkeys(true_loc, i))
+    sorted_digits = sorted(digits.items())
+    sorted_digits = [str(x[1]) for x in sorted_digits]
+    try:
+        found_cash = int("".join(sorted_digits))
+        # cv.imwrite(f"debug/{found_cash}.png", picture)
+        return found_cash
+    except ValueError:
+        print("Could not recognise cash value")
+        return -1
+"""
