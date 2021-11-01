@@ -1,6 +1,7 @@
 import os
 import random
 import sys
+import threading
 from time import sleep
 
 import cv2 as cv
@@ -19,6 +20,7 @@ CANCEL_BTN_LOC = (780, 730)
 NUMBER_OF_EXPERT_MAP_SCREENS = 2
 PLAY_BUTTON_TEMPLATE = cv.imread("templates/play_button.png", cv.IMREAD_GRAYSCALE)
 REVEAL_INSTA_TEMPLATE = cv.imread("templates/secret_insta.png", cv.IMREAD_GRAYSCALE)
+MONKE_W_TEMPLATE = cv.imread("templates/monkeW.png", cv.IMREAD_GRAYSCALE)
 BONUS_TEMPLATE = cv.imread("templates/pumpkin.png", cv.IMREAD_GRAYSCALE)  # image of current bonus event marker
 
 
@@ -100,13 +102,29 @@ def open_chest():
     sleep(0.3)
 
 
+
+
+def check_for_level_up():
+  threading.Timer(60.0, check_for_level_up).start()
+  if match_template(take_screenshot("screenshots/check_lvl_up.png"), MONKE_W_TEMPLATE):
+    click()
+    sleep(0.3)
+    click()
+    sleep(0.3)
+    click()
+    sleep(0.3)
+    
+
+check_for_level_up()
+
+
 def main():
     print("The program will take and store single screenshots of your first monitor for navigation purposes\n")
     
     print("Navigate to Bloons TD 6 main menu on monitor 1, then press Enter to continue")
     # print("Press Alt+1 to exit the program (hopefully)")
     # keyboard.add_hotkey("alt+1", lambda: sys.exit(0), suppress=True)
-
+    
     # press enter after opening bloons on the main menu
     keyboard.wait("enter")
 
@@ -138,7 +156,6 @@ def main():
             nav_victory_to_main()
             if not match_template(take_screenshot(), PLAY_BUTTON_TEMPLATE):
                 open_chest()
-    return
 
 
 main()

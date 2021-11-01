@@ -26,19 +26,20 @@ def press(button):
 
 
 # saves screenshot to "monitor1.png" and returns a greyscaled image
-def take_screenshot():
+def take_screenshot(location="screenshots/monitor1.png"):
     with mss() as sct:
-        sct.shot(output="screenshots/monitor1.png")
-    return cv.imread("screenshots/monitor1.png", cv.IMREAD_GRAYSCALE)
+        sct.shot(output=location)
+    return cv.imread(location, cv.IMREAD_GRAYSCALE)
 
 
 # returns the top left coordinates of tmpl inside of img
 def match_template(img, tmpl):
+    w, h = tmpl.shape[::-1]
     res = cv.matchTemplate(img, tmpl, cv.TM_CCOEFF_NORMED)
     print(res)
     min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
     print(max_val)
-    if max_val > 0.6:
-        return max_loc
+    if max_val > 0.85:
+        return [max_loc[0] + w//2, max_loc[1] + h//2]
     else:
         return False
