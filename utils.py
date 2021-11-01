@@ -1,6 +1,7 @@
 import random
 from time import sleep
 
+import cv2 as cv
 import keyboard
 import win32api as wa
 from mss import mss
@@ -24,7 +25,20 @@ def press(button):
     sleep(0.2)
 
 
-# saves screenshot to "monitor-1.png"
+# saves screenshot to "monitor1.png" and returns a greyscaled image
 def take_screenshot():
     with mss() as sct:
         sct.shot(output="screenshots/monitor1.png")
+    return cv.imread("screenshots/monitor1.png", cv.IMREAD_GRAYSCALE)
+
+
+# returns the top left coordinates of tmpl inside of img
+def match_template(img, tmpl):
+    res = cv.matchTemplate(img, tmpl, cv.TM_CCOEFF_NORMED)
+    print(res)
+    min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
+    print(max_val)
+    if max_val > 0.3:
+        return max_loc
+    else:
+        return False

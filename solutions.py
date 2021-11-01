@@ -2,15 +2,15 @@ import logging as log
 from time import sleep
 
 import cv2 as cv
-from mss import base
 import numpy as np
 
 from config import hotkeys
-from utils import click, move_cursor, press, take_screenshot
+from utils import click, match_template, move_cursor, press, take_screenshot
 
 UPG_TOP = "upg_top"
 UPG_MID = "upg_mid"
 UPG_BOT = "upg_bot"
+NEXT_BUTTON_TEMPLATE = cv.imread("templates/next_button.png", cv.IMREAD_GRAYSCALE)
 
 
 MONKEY_COSTS = {
@@ -104,7 +104,7 @@ class Monkey:
 
 
 def start_game():
-    wait_for_cash(850)
+    wait_for_cash(650)
     press(hotkeys["play_ff"])
     sleep(0.3)
     press(hotkeys["play_ff"])
@@ -123,17 +123,15 @@ def upgrade(path, position):
         press("esc")
 
 
-# returns current cash or -1 if template matching fails
-def find_cash():
-    take_screenshot()
-    screenshot = cv.imread("screenshots/monitor1.png", cv.IMREAD_GRAYSCALE)
+def find_number_on_screen(x_start, x_end, y_start, y_end):
+    screenshot = take_screenshot()
     thresh = cv.adaptiveThreshold(screenshot, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 7, 2)
-    cash_crop = thresh[20:65, 345:530]
+    number_crop = thresh[y_start:y_end, x_start:x_end]
     digits = {}
     for i in range(10):
         digit = cv.imread(f"numbers/{i}.png", cv.IMREAD_GRAYSCALE)
         w, h = digit.shape[::-1]                                      # Dimensions of input template, only 2 arguments because image is grayscale
-        match = cv.matchTemplate(cash_crop, digit, cv.TM_CCOEFF_NORMED)
+        match = cv.matchTemplate(number_crop, digit, cv.TM_CCOEFF_NORMED)
         threshold = 0.75
         loc = np.where(match >= threshold)                            # NumPy is a fuck
         last_x = False
@@ -147,74 +145,56 @@ def find_cash():
     sorted_digits = sorted(digits.items())
     sorted_digits = [str(x[1]) for x in sorted_digits]
     try:
-        found_cash = int("".join(sorted_digits))
-        # turn on to gather pictures for debugging
-        # cv.imwrite(f"debug/{found_cash}.png", cash_crop)
-        return found_cash
+        found_number = int("".join(sorted_digits))
+        return found_number
     except ValueError:
-        print("Could not recognise cash value")
+        print("Could not recognise value")
         return -1
+
+
+# returns current cash or -1 if template matching fails
+def find_cash():
+    return find_number_on_screen(345, 530, 20, 65)
 
 
 def wait_for_cash(amount):
     sleep(1)
     current_cash = find_cash()
     while current_cash < amount:
-        print("current: " + str(current_cash) + " < " + str(amount))
+        print(f"Current cash: {current_cash} < {amount}")
         sleep(3)
         current_cash = find_cash()
     else:
-        print(str(current_cash) + " > " + str(amount))
+        print(f"Current cash: {current_cash} >= {amount}")
         return
 
 
 # returns current round or -1 if template matching fails
 def find_round():
-    take_screenshot()
-    screenshot = cv.imread("screenshots/monitor1.png", cv.IMREAD_GRAYSCALE)
-    thresh = cv.adaptiveThreshold(screenshot, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 7, 2)
-    round_crop = thresh[28:70, 1420:1486]
-    digits = {}
-    for i in range(10):
-        digit = cv.imread(f"numbers/{i}.png", cv.IMREAD_GRAYSCALE)
-        w, h = digit.shape[::-1]                                      # Dimensions of input template, only 2 arguments because image is grayscale
-        match = cv.matchTemplate(round_crop, digit, cv.TM_CCOEFF_NORMED)
-        threshold = 0.75
-        loc = np.where(match >= threshold)                            # NumPy is a fuck
-        last_x = False
-        loc[1].sort()
-        true_loc = loc[1].tolist()                                    # Have to convert NumPy array to a normal fucking list
-        for x in loc[1]:                                              # Goes through list of x-coordinates of matched points
-            if isinstance(last_x, np.int64) and x - last_x < w // 2:  # Checks if last_x is a NumPy int64 and if it's too close to the next element
-                true_loc.pop(true_loc.index(last_x))                  # Removes last_x from list if it's too close to the next element
-            last_x = x                                                # Sets last_x up for next iteration and we go agane
-        digits.update(dict.fromkeys(true_loc, i))
-    sorted_digits = sorted(digits.items())
-    sorted_digits = [str(x[1]) for x in sorted_digits]
-    try:
-        found_round = int("".join(sorted_digits))
-        return found_round
-    except ValueError:
-        print("Could not recognise round value")
-        return -1
+    return find_number_on_screen(1420, 1486, 28, 70)
 
 
 def wait_for_round(number):
     sleep(1)
     current_round = find_round()
     while current_round < number:
-        print("current round: " + str(current_round) + " < " + str(number))
-        sleep(3)
+        print(f"Current round: {current_round} < {number}")
+        sleep(10)
         current_round = find_round()
     else:
-        print("current round: " + str(current_round) + " >= " + str(number))
+        print(f"Current round: {current_round} >= {number}")
         return
 
 
-def wait_for_victory(seconds):
-    # go, next = [900, 888], [1024, 935]
-    sleep(seconds)
-
+def wait_for_victory():
+    screenshot = take_screenshot()
+    print("res:")
+    match = match_template(screenshot, NEXT_BUTTON_TEMPLATE)
+    if not match:
+        print("didnt win yet")
+        sleep(3)
+        wait_for_victory()
+  
 
 # Sets targeting for tower located at position to Strong for normal towers or Smart for spactory
 def set_targeting(position):
@@ -303,23 +283,26 @@ def solve_flooded_valley():
 
 def solve_infernal():
     dart1 = Monkey("dart", 834, 387)
-    Monkey("hero", 122, 643)
-    dart1.upgrade(UPG_BOT)
     sub1 = Monkey("sub", 487, 789)
-    sub1.upgrade(UPG_TOP)
-    sub1.upgrade(UPG_TOP)
-    dart1.upgrade(UPG_BOT)
-    sub1.upgrade(UPG_BOT)
-    sub1.upgrade(UPG_BOT)
     sniper1 = Monkey("sniper", 1568, 599)
     sniper1.set_targeting("strong")
+    Monkey("hero", 122, 643)
+    sniper1.upgrade(UPG_BOT)
+    dart1.upgrade(UPG_BOT)
+    sub1.upgrade(UPG_TOP)
+    sub1.upgrade(UPG_TOP)
+    dart1.upgrade(UPG_BOT)
+    sub1.upgrade(UPG_BOT)
+    sub1.upgrade(UPG_BOT)
     sniper1.upgrade(UPG_TOP)
     sniper1.upgrade(UPG_BOT)
+    sub1.upgrade(UPG_BOT)
+    sub1.upgrade(UPG_BOT)
     sniper1.upgrade(UPG_BOT)
-    sub1.upgrade(UPG_BOT)
-    sub1.upgrade(UPG_BOT)
+    sniper1.upgrade(UPG_TOP)
+    sniper1.upgrade(UPG_BOT)
     wait_for_round(39)
-    wait_for_victory(20)
+    wait_for_victory()
 
 
 def solve_bloody_puddles():

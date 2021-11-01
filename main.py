@@ -7,7 +7,7 @@ import cv2 as cv
 import keyboard
 
 import solutions
-from utils import click, move_cursor, press, take_screenshot
+from utils import click, match_template, move_cursor, press, take_screenshot
 
 PLAY_BTN_LOC = (800, 950)
 EXPERT_BTN_LOC = (1300, 1000)
@@ -22,7 +22,8 @@ INSTA_TRIO_3_BTN_LOC = (1256, 535)
 CONTINUE_BTN_LOC = (950, 1000)
 CANCEL_BTN_LOC = (780, 730)
 NUMBER_OF_EXPERT_MAP_SCREENS = 2
-BONUS_TEMPLATE = cv.imread("bonus/pumpkin.png", cv.IMREAD_GRAYSCALE)  # image of current bonus event marker
+PLAY_BUTTON_TEMPLATE = cv.imread("templates/play_button.png", cv.IMREAD_GRAYSCALE)
+BONUS_TEMPLATE = cv.imread("templates/pumpkin.png", cv.IMREAD_GRAYSCALE)  # image of current bonus event marker
 
 
 def get_map(page, x, y):
@@ -83,11 +84,14 @@ def open_chest():
     move_cursor(*CHEST_BTN_LOC)
     click()
     sleep(0.6)
-    reveal_insta(INSTA_TRIO_1_BTN_LOC)
-    reveal_insta(INSTA_DUO_1_BTN_LOC)
-    reveal_insta(INSTA_TRIO_2_BTN_LOC)
-    reveal_insta(INSTA_DUO_2_BTN_LOC)
-    reveal_insta(INSTA_TRIO_3_BTN_LOC)
+    match = match_template(take_screenshot(), PLAY_BUTTON_TEMPLATE)
+    while match:
+        move_cursor(*match)
+        click()
+        sleep(0.3)
+        click()
+        sleep(0.3)
+        match = match_template(take_screenshot(), PLAY_BUTTON_TEMPLATE)
     move_cursor(*CONTINUE_BTN_LOC)
     click()
     sleep(0.3)
@@ -100,19 +104,9 @@ def open_chest():
     sleep(0.3)
 
 
-# returns the top left coordinates of tmpl inside of img
-def match_template(img, tmpl):
-    res = cv.matchTemplate(img, tmpl, cv.TM_CCOEFF_NORMED)
-    min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
-    if max_val > 0.3:
-        return max_loc
-    else:
-        return False
-
-
 def main():
     print("The program will take and store single screenshots of your first monitor for navigation purposes\n")
-
+    
     print("Navigate to Bloons TD 6 main menu on monitor 1, then press Enter to continue")
     # print("Press Alt+1 to exit the program (hopefully)")
     # keyboard.add_hotkey("alt+1", lambda: sys.exit(0), suppress=True)
@@ -132,9 +126,7 @@ def main():
 
         while not match:
             sleep(0.3)
-            take_screenshot()
-            # read in screenshot from file in grayscale
-            menu_screenshot = cv.imread("screenshots/monitor1.png", cv.IMREAD_GRAYSCALE)
+            menu_screenshot = take_screenshot()
             match = match_template(menu_screenshot, BONUS_TEMPLATE)
             if not match:
                 click()
@@ -149,7 +141,8 @@ def main():
             click()
             solutions.solve(get_map(page, *match))
             nav_victory_to_main()
-            open_chest()
+            if not match_template(take_screenshot(), PLAY_BUTTON_TEMPLATE):
+                open_chest()
     return
 
 
