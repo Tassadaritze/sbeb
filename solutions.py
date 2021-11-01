@@ -11,8 +11,6 @@ UPG_TOP = "upg_top"
 UPG_MID = "upg_mid"
 UPG_BOT = "upg_bot"
 NEXT_BUTTON_TEMPLATE = cv.imread("templates/next_button.png", cv.IMREAD_GRAYSCALE)
-
-
 MONKEY_COSTS = {
     "dart": {"base": 170, UPG_TOP: (120, 185, 255, 1530, 12750), UPG_MID: (85, 160, 340, 6800, 38250), UPG_BOT: (75, 170, 530, 1700, 21250)},
     "boomer": "w",
@@ -102,7 +100,6 @@ class Monkey:
         print(f"I am a {self.upgrades[UPG_TOP]}/{self.upgrades[UPG_MID]}/{self.upgrades[UPG_BOT]} {self.type}")
 
 
-
 def start_game():
     wait_for_cash(650)
     press(hotkeys["play_ff"])
@@ -124,8 +121,7 @@ def upgrade(path, position):
 
 
 def find_number_on_screen(x_start, x_end, y_start, y_end):
-    screenshot = take_screenshot()
-    thresh = cv.adaptiveThreshold(screenshot, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 7, 2)
+    thresh = cv.adaptiveThreshold(take_screenshot(), 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 7, 2)
     number_crop = thresh[y_start:y_end, x_start:x_end]
     digits = {}
     for i in range(10):
@@ -187,11 +183,9 @@ def wait_for_round(number):
 
 
 def wait_for_victory():
-    screenshot = take_screenshot()
     print("res:")
-    match = match_template(screenshot, NEXT_BUTTON_TEMPLATE)
+    match = match_template(take_screenshot(), NEXT_BUTTON_TEMPLATE)
     if not match:
-        print("didnt win yet")
         sleep(3)
         wait_for_victory()
   

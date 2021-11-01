@@ -126,8 +126,7 @@ def main():
 
         while not match:
             sleep(0.3)
-            menu_screenshot = take_screenshot()
-            match = match_template(menu_screenshot, BONUS_TEMPLATE)
+            match = match_template(take_screenshot(), BONUS_TEMPLATE)
             if not match:
                 click()
                 page = (page + 1) % NUMBER_OF_EXPERT_MAP_SCREENS
