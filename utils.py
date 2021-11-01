@@ -38,7 +38,7 @@ def match_template(img, tmpl):
     print(res)
     min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
     print(max_val)
-    if max_val > 0.3:
+    if max_val > 0.6:
         return max_loc
     else:
         return False

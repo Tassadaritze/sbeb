@@ -233,7 +233,7 @@ def solve_sanctuary():
     press(hotkeys[UPG_BOT])
     press("escape")
     wait_for_round(39)
-    wait_for_victory(20)
+    wait_for_victory()
 
 
 def solve_ravine():
@@ -258,7 +258,7 @@ def solve_ravine():
     sniper1.upgrade(UPG_BOT)
     sniper1.upgrade(UPG_BOT)
     wait_for_round(39)
-    wait_for_victory(20)
+    wait_for_victory()
 
 
 def solve_flooded_valley():
@@ -278,7 +278,7 @@ def solve_flooded_valley():
     sub2.upgrade(UPG_BOT)
     sub1.upgrade(UPG_BOT)
     wait_for_round(39)
-    wait_for_victory(20)
+    wait_for_victory()
 
 
 def solve_infernal():
@@ -299,6 +299,11 @@ def solve_infernal():
     sub1.upgrade(UPG_BOT)
     sub1.upgrade(UPG_BOT)
     sniper1.upgrade(UPG_BOT)
+    sniper2 = Monkey("sniper", 1578, 532)
+    sniper2.upgrade(UPG_MID)
+    sniper2.upgrade(UPG_MID)
+    sniper2.upgrade(UPG_BOT)
+    sniper2.upgrade(UPG_BOT)
     sniper1.upgrade(UPG_TOP)
     sniper1.upgrade(UPG_BOT)
     wait_for_round(39)
@@ -332,7 +337,7 @@ def solve_bloody_puddles():
     sub1.upgrade(UPG_BOT)
     sub1.upgrade(UPG_BOT)
     wait_for_round(39)
-    wait_for_victory(20)
+    wait_for_victory()
 
 
 def solve_workshop():
@@ -358,7 +363,7 @@ def solve_workshop():
     spac2.upgrade(UPG_BOT)
     spac2.upgrade(UPG_TOP)
     wait_for_round(39)
-    wait_for_victory(20)
+    wait_for_victory()
 
 
 def solve_quad():
@@ -382,7 +387,7 @@ def solve_quad():
     sniper1.upgrade(UPG_BOT)
     sniper1.upgrade(UPG_BOT)
     wait_for_round(39)
-    wait_for_victory(20)
+    wait_for_victory()
 
 
 def solve_dark_castle():
@@ -406,7 +411,7 @@ def solve_dark_castle():
     alch1.upgrade(UPG_MID)
     alch1.upgrade(UPG_TOP)
     wait_for_round(39)
-    wait_for_victory(20)
+    wait_for_victory()
 
 
 def solve_muddy_puddles():
@@ -430,7 +435,7 @@ def solve_muddy_puddles():
     sub1.upgrade(UPG_BOT)
     sub1.upgrade(UPG_BOT)
     wait_for_round(39)
-    wait_for_victory(20)
+    wait_for_victory()
 
 
 def solve_ouch():
@@ -454,7 +459,7 @@ def solve_ouch():
     sub1.upgrade(UPG_BOT)
     sub1.upgrade(UPG_BOT)
     wait_for_round(39)
-    wait_for_victory(20)
+    wait_for_victory()
 
 
 # DEBUG automatic cash detection with gathered images from find_cash().

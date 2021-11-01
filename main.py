@@ -113,7 +113,7 @@ def main():
 
     # press enter after opening bloons on the main menu
     keyboard.wait("enter")
-    
+
     screenshot_path = "screenshots"
     if not os.path.exists(screenshot_path):
         os.makedirs(screenshot_path)
