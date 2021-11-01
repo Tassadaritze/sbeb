@@ -18,6 +18,7 @@ CONTINUE_BTN_LOC = (950, 1000)
 CANCEL_BTN_LOC = (780, 730)
 NUMBER_OF_EXPERT_MAP_SCREENS = 2
 PLAY_BUTTON_TEMPLATE = cv.imread("templates/play_button.png", cv.IMREAD_GRAYSCALE)
+REVEAL_INSTA_TEMPLATE = cv.imread("templates/secret_insta.png", cv.IMREAD_GRAYSCALE)
 BONUS_TEMPLATE = cv.imread("templates/pumpkin.png", cv.IMREAD_GRAYSCALE)  # image of current bonus event marker
 
 
@@ -79,14 +80,14 @@ def open_chest():
     move_cursor(*CHEST_BTN_LOC)
     click()
     sleep(0.6)
-    match = match_template(take_screenshot(), PLAY_BUTTON_TEMPLATE)
+    match = match_template(take_screenshot(), REVEAL_INSTA_TEMPLATE)
     while match:
         move_cursor(*match)
         click()
         sleep(0.3)
         click()
         sleep(0.3)
-        match = match_template(take_screenshot(), PLAY_BUTTON_TEMPLATE)
+        match = match_template(take_screenshot(), REVEAL_INSTA_TEMPLATE)
     move_cursor(*CONTINUE_BTN_LOC)
     click()
     sleep(0.3)
