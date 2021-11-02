@@ -5,6 +5,7 @@ import threading
 from time import sleep
 
 import cv2 as cv
+import numpy as np
 import keyboard
 
 import solutions
@@ -113,9 +114,6 @@ def check_for_level_up():
     sleep(0.3)
     click()
     sleep(0.3)
-    
-
-check_for_level_up()
 
 
 def main():
@@ -127,6 +125,21 @@ def main():
     
     # press enter after opening bloons on the main menu
     keyboard.wait("enter")
+
+    # VVV debugging some insta stuff VVV
+    """
+    img_gray = take_screenshot()
+    template = REVEAL_INSTA_TEMPLATE
+    w, h = template.shape[::-1]
+    res = cv.matchTemplate(img_gray, template, cv.TM_CCOEFF_NORMED)
+    threshold = 0.8
+    loc = np.where(res >= threshold)
+    print(loc)
+    for pt in zip(*loc[::-1]):
+        cv.rectangle(img_gray, pt, (pt[0] + w, pt[1] + h), (255, 255, 255), 2)
+    cv.imwrite('res.png', img_gray)
+    keyboard.wait("enter")
+    """
 
     screenshot_path = "screenshots"
     if not os.path.exists(screenshot_path):
@@ -158,4 +171,5 @@ def main():
                 open_chest()
 
 
+check_for_level_up()
 main()
