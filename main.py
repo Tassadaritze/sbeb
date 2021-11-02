@@ -81,7 +81,7 @@ def reveal_insta(insta_position):
 def open_chest():
     move_cursor(*CHEST_BTN_LOC)
     click()
-    sleep(0.6)
+    sleep(1)
     match = match_template(take_screenshot(), REVEAL_INSTA_TEMPLATE)
     while match:
         move_cursor(*match)
