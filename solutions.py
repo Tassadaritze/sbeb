@@ -103,7 +103,7 @@ class Monkey:
 def start_game():
     wait_for_cash(650)
     press(hotkeys["play_ff"])
-    sleep(0.3)
+    sleep(0.2)
     press(hotkeys["play_ff"])
 
 
@@ -154,12 +154,11 @@ def find_cash():
 
 
 def wait_for_cash(amount):
-    sleep(1)
     current_cash = find_cash()
-    while current_cash < amount:
+    if current_cash < amount:
         print(f"Current cash: {current_cash} < {amount}")
-        sleep(3)
-        current_cash = find_cash()
+        sleep(2)
+        wait_for_cash(amount)
     else:
         print(f"Current cash: {current_cash} >= {amount}")
         return
@@ -171,12 +170,11 @@ def find_round():
 
 
 def wait_for_round(number):
-    sleep(1)
     current_round = find_round()
-    while current_round < number:
+    if current_round < number:
         print(f"Current round: {current_round} < {number}")
         sleep(10)
-        current_round = find_round()
+        wait_for_round(number)
     else:
         print(f"Current round: {current_round} >= {number}")
         return

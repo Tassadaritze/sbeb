@@ -22,7 +22,7 @@ def click():
 
 def press(button):
     keyboard.press_and_release(button)
-    sleep(0.2)
+    sleep(0.1)
 
 
 # saves screenshot to "monitor1.png" and returns a greyscaled image
@@ -36,9 +36,7 @@ def take_screenshot(location="screenshots/monitor1.png"):
 def match_template(img, tmpl):
     w, h = tmpl.shape[::-1]
     res = cv.matchTemplate(img, tmpl, cv.TM_CCOEFF_NORMED)
-    print(res)
     min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
-    print(max_val)
     if max_val > 0.85:
         return [max_loc[0] + w//2, max_loc[1] + h//2]
     else:

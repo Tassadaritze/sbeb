@@ -102,9 +102,8 @@ def open_chest():
     sleep(0.3)
 
 
-
-
 def check_for_level_up():
+  threading.Thread.daemon = True
   threading.Timer(60.0, check_for_level_up).start()
   if match_template(take_screenshot("screenshots/check_lvl_up.png"), MONKE_W_TEMPLATE):
     click()
