@@ -350,7 +350,7 @@ def solve_bloody_puddles():
 
 
 def solve_workshop():
-    dart1 = Monkey("dart", 920, 502)
+    dart1 = Monkey("dart", 647, 498)
     Monkey("hero", 1214, 267)
     sniper1 = Monkey("sniper", 1020, 500)
     sniper1.set_targeting("strong")
