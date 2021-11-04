@@ -97,7 +97,7 @@ class Monkey:
 
 
     def identify(self):
-        print(f"I am a {self.upgrades[UPG_TOP]}/{self.upgrades[UPG_MID]}/{self.upgrades[UPG_BOT]} {self.type}")
+        log.info(f"I am a {self.upgrades[UPG_TOP]}/{self.upgrades[UPG_MID]}/{self.upgrades[UPG_BOT]} {self.type}")
 
 
 def start_game():
@@ -144,7 +144,7 @@ def find_number_on_screen(x_start, x_end, y_start, y_end):
         found_number = int("".join(sorted_digits))
         return found_number
     except ValueError:
-        print("Could not recognise value")
+        log.info("Could not recognise value")
         return -1
 
 
@@ -156,11 +156,11 @@ def find_cash():
 def wait_for_cash(amount):
     current_cash = find_cash()
     if current_cash < amount:
-        print(f"Current cash: {current_cash} < {amount}")
+        log.info(f"Current cash: {current_cash} < {amount}")
         sleep(2)
         wait_for_cash(amount)
     else:
-        print(f"Current cash: {current_cash} >= {amount}")
+        log.info(f"Current cash: {current_cash} >= {amount}")
         return
 
 
@@ -172,18 +172,19 @@ def find_round():
 def wait_for_round(number):
     current_round = find_round()
     if current_round < number:
-        print(f"Current round: {current_round} < {number}")
+        log.info(f"Current round: {current_round} < {number}")
         sleep(10)
         wait_for_round(number)
     else:
-        print(f"Current round: {current_round} >= {number}")
+        log.info(f"Current round: {current_round} >= {number}")
         return
 
 
 def wait_for_victory():
-    print("res:")
+    log.info("Trying to match the next button template")
     match = match_template(take_screenshot(), NEXT_BUTTON_TEMPLATE)
     if not match:
+        log.info("Couldn't match the next button template")
         sleep(3)
         wait_for_victory()
   
@@ -224,6 +225,7 @@ def solve_sanctuary():
     wait_for_cash(11900)
     press(hotkeys[UPG_BOT])
     press("escape")
+    log.info("Finished placing/upgrading monkeys on Sanctuary, waiting for game to end")
     wait_for_round(39)
     wait_for_victory()
 
@@ -247,6 +249,7 @@ def solve_ravine():
     sniper1.upgrade(UPG_BOT)
     sniper1.upgrade(UPG_TOP)
     sniper1.upgrade(UPG_BOT)
+    log.info("Finished placing/upgrading monkeys on Ravine, waiting for game to end")
     wait_for_round(39)
     wait_for_victory()
 
@@ -278,6 +281,7 @@ def solve_flooded_valley():
     sniper1.upgrade(UPG_BOT)
     sub2.upgrade(UPG_BOT)
     sub1.upgrade(UPG_BOT)
+    log.info("Finished placing/upgrading monkeys on Flooded Valley, waiting for game to end")
     wait_for_round(39)
     wait_for_victory()
 
@@ -307,6 +311,7 @@ def solve_infernal():
     sniper1.upgrade(UPG_TOP)
     sniper1.upgrade(UPG_BOT)
     sniper2.upgrade(UPG_BOT)
+    log.info("Finished placing/upgrading monkeys on Infernal, waiting for game to end")
     wait_for_round(39)
     wait_for_victory()
 
@@ -345,6 +350,7 @@ def solve_bloody_puddles():
     sniper2.upgrade(UPG_MID)
     sniper2.upgrade(UPG_BOT)
     sniper2.upgrade(UPG_BOT)
+    log.info("Finished placing/upgrading monkeys on Bloody Puddles, waiting for game to end")
     wait_for_round(39)
     wait_for_victory()
 
@@ -367,6 +373,7 @@ def solve_workshop():
     sniper1.upgrade(UPG_BOT)
     sniper1.upgrade(UPG_BOT)
     sniper1.upgrade(UPG_TOP)
+    log.info("Finished placing/upgrading monkeys on Workshop, waiting for game to end")
     wait_for_round(39)
     wait_for_victory()
 
@@ -396,6 +403,7 @@ def solve_quad():
     sniper1.upgrade(UPG_TOP)
     sniper1.upgrade(UPG_BOT)
     sniper1.upgrade(UPG_BOT)
+    log.info("Finished placing/upgrading monkeys on Quad, waiting for game to end")
     wait_for_round(39)
     wait_for_victory()
 
@@ -421,6 +429,7 @@ def solve_dark_castle():
     sniper1.upgrade(UPG_TOP)
     sniper1.upgrade(UPG_BOT)
     dart1.upgrade(UPG_BOT)
+    log.info("Finished placing/upgrading monkeys on Dark Castle, waiting for game to end")
     wait_for_round(39)
     wait_for_victory()
 
@@ -448,6 +457,7 @@ def solve_muddy_puddles():
     sniper1.upgrade(UPG_BOT)
     sniper1.upgrade(UPG_TOP)
     sniper1.upgrade(UPG_BOT)
+    log.info("Finished placing/upgrading monkeys on Muddy Puddles, waiting for game to end")
     wait_for_round(39)
     wait_for_victory()
 
@@ -475,6 +485,7 @@ def solve_ouch():
     sniper1.upgrade(UPG_BOT)
     sniper1.upgrade(UPG_TOP)
     sniper1.upgrade(UPG_BOT)
+    log.info("Finished placing/upgrading monkeys on #Ouch, waiting for game to end")
     wait_for_round(39)
     wait_for_victory()
 
