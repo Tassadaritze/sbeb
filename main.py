@@ -1,11 +1,12 @@
+import logging as log
 import os
 import random
 import sys
 import threading
+import time
 from time import sleep
 
 import cv2 as cv
-import logging as log
 import keyboard
 
 import solutions
@@ -140,6 +141,7 @@ def main():
 
     while True:
         log.info("Starting main loop, navigating to expert maps")
+        starting_time = time.time()
         nav_main_to_expert()
 
         match = False
@@ -155,6 +157,7 @@ def main():
                 page = (page + 1) % NUMBER_OF_EXPERT_MAP_SCREENS
         else:
             log.info("Found match for bonus reward template, trying to enter matched map")
+            map_with_bonus = get_map(page, *match)
             move_cursor(*match)
             click()
             sleep(0.3)
@@ -162,9 +165,11 @@ def main():
             click()
             sleep(0.3)
             click()
-            solutions.solve(get_map(page, *match))
+            solutions.solve(map_with_bonus)
             log.info("Finished map, navigating back to main menu")
             nav_victory_to_main()
+            time_taken = time.time() - starting_time
+            log.info(f"Time taken for {map_with_bonus}: {int(time_taken)}")
             log.info("Trying to match play button template to see whether we're in the main menu")
             if not match_template(take_screenshot(), PLAY_BUTTON_TEMPLATE):
                 log.info("Could not match play button template, must be in insta chest menu: trying to open the chest")
