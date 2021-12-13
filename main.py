@@ -18,7 +18,7 @@ CONTINUE_BTN_LOC = (950, 1000)
 CANCEL_BTN_LOC = (780, 730)
 NUMBER_OF_EXPERT_MAP_SCREENS = 2
 PLAY_BUTTON_TEMPLATE = cv.imread("templates/play_button.png", cv.IMREAD_GRAYSCALE)
-BONUS_TEMPLATE = cv.imread("templates/pumpkin.png", cv.IMREAD_GRAYSCALE)  # image of current bonus event marker
+BONUS_TEMPLATE = cv.imread("templates/bonus.png", cv.IMREAD_GRAYSCALE)  # image of current bonus event marker
 
 
 def get_map(page, x, y):
